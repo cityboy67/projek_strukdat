@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Monopoly Game</title>
+
+<style>
+    body{
+        font-family: Arial;
+        text-align: center;
+        background: #f2f2f2;
+    }
+
+    h1{
+        margin-top:20px;
+    }
+
+    .board{
+        width:500px;
+        height:500px;
+        margin:20px auto;
+        position:relative;
+        border:3px solid black;
+        background:white;
+    }
+
+    .cell{
+        width:100px;
+        height:100px;
+        border:1px solid gray;
+        position:absolute;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        box-sizing:border-box;
+        font-weight:bold;
+    }
+
+    .checkpoint{
+        background: gold;
+    }
+
+    .player{
+        width:25px;
+        height:25px;
+        border-radius:50%;
+        position:absolute;
+        transition: transform 0.5s;
+        z-index:10;
+    }
+
+    button{
+        padding:10px 20px;
+        margin:10px;
+        cursor:pointer;
+    }
+
+    input{
+        padding:8px;
+        width:120px;
+    }
+
+    #scoreBoard{
+        margin-top:20px;
+        font-size:18px;
+        font-weight:bold;
+    }
+</style>
+</head>
+<body>
+
+<h1>Mini Monopoly Quiz Game</h1>
+
+<input type="number" id="playerCount" min="1" max="4" placeholder="1-4 player">
+<button onclick="startGame()">Start Game</button>
+
+<div class="board" id="board"></div>
+
+<button onclick="rollDice()">Roll Dice</button>
+
+<h2 id="info">Masukkan jumlah player</h2>
+
+<div id="scoreBoard"></div>
+
+<script>
+const board = document.getElementById("board");
+const info = document.getElementById("info");
+const scoreBoard = document.getElementById("scoreBoard");
+
+const colors = ["red","blue","green","yellow"];
+
+const checkpointTiles = [3,7,12];
+
+const targetPoints = 300;
+
+const questions = [
+    {
+        question: "2 + 2 = ?",
+        answer: "4"
+    },
+    {
+        question: "Ibu kota Indonesia?",
+        answer: "jakarta"
+    },
+    {
+        question: "5 x 6 = ?",
+        answer: "30"
+    },
+    {
+        question: "HTML singkatan dari?",
+        answer: "hypertext markup language"
+    },
+    {
+        question: "CSS digunakan untuk?",
+        answer: "styling"
+    },
+    {
+        question: "Bahasa pemrograman web?",
+        answer: "javascript"
+    },
+    {
+        question: "Planet terbesar?",
+        answer: "jupiter"
+    },
+    {
+        question: "1 byte berapa bit?",
+        answer: "8"
+    },
+    {
+        question: "Framework frontend populer?",
+        answer: "react"
+    },
+    {
+        question: "Siapa presiden pertama Indonesia?",
+        answer: "soekarno"
+    }
+];
+
+const positions = [
+    {x:0,y:0},
+    {x:100,y:0},
+    {x:200,y:0},
+    {x:300,y:0},
+    {x:400,y:0},
+
+    {x:400,y:100},
+    {x:400,y:200},
+    {x:400,y:300},
+    {x:400,y:400},
+
+    {x:300,y:400},
+    {x:200,y:400},
+    {x:100,y:400},
+    {x:0,y:400},
+
+    {x:0,y:300},
+    {x:0,y:200},
+    {x:0,y:100}
+];
+
+let players = [];
+let currentTurn = 0;
+let isMoving = false;
+let gameOver = false;
+
+createBoard();
+
+function createBoard(){
+    board.innerHTML = "";
+
+    positions.forEach((pos,index)=>{
+        let cell = document.createElement("div");
+        cell.classList.add("cell");
+
+        if(checkpointTiles.includes(index)){
+            cell.classList.add("checkpoint");
+            cell.innerText = "Q" + index;
+        }else{
+            cell.innerText = index;
+        }
+
+        cell.style.left = pos.x + "px";
+        cell.style.top = pos.y + "px";
+
+        board.appendChild(cell);
+    });
+}
+
+function startGame(){
+    let count = parseInt(document.getElementById("playerCount").value);
+
+    if(count < 1 || count > 4 || isNaN(count)){
+        alert("Jumlah player harus 1-4");
+        return;
+    }
+
+    createBoard();
+
+    players = [];
+    currentTurn = 0;
+    gameOver = false;
+
+    for(let i=0;i<count;i++){
+        let player = document.createElement("div");
+        player.classList.add("player");
+        player.style.background = colors[i];
+
+        player.style.top = (10 + i*30) + "px";
+        player.style.left = "10px";
+
+        board.appendChild(player);
+
+        players.push({
+            element: player,
+            position: 0,
+            points: 0
+        });
+    }
+
+    info.innerHTML = "Game dimulai! Giliran Player 1";
+    updateScoreBoard();
+}
+
+function updateScoreBoard(){
+    let html = "";
+
+    players.forEach((player,index)=>{
+        html += `Player ${index+1}: ${player.points} poin<br>`;
+    });
+
+    scoreBoard.innerHTML = html;
+}
+
+function askQuestion(playerIndex){
+    let randomQuestion =
+        questions[Math.floor(Math.random()*questions.length)];
+
+    let answer = prompt(randomQuestion.question);
+
+    if(
+        answer &&
+        answer.toLowerCase().trim() ===
+        randomQuestion.answer.toLowerCase()
+    ){
+        alert("Jawaban benar! +20 poin");
+        players[playerIndex].points += 20;
+    }else{
+        alert("Jawaban salah!");
+    }
+
+    updateScoreBoard();
+}
+
+function checkWinner(playerIndex){
+    if(players[playerIndex].points >= targetPoints){
+        alert("Player " + (playerIndex+1) + " MENANG!");
+        info.innerHTML =
+            "Player " + (playerIndex+1) + " memenangkan game!";
+        gameOver = true;
+    }
+}
+
+function movePlayer(playerIndex, steps){
+    isMoving = true;
+    let count = 0;
+
+    let interval = setInterval(function(){
+
+        players[playerIndex].position++;
+
+        if(players[playerIndex].position >= positions.length){
+            players[playerIndex].position = 0;
+
+            players[playerIndex].points += 10;
+            alert("Melewati START! +10 poin");
+        }
+
+        let pos = positions[players[playerIndex].position];
+
+        players[playerIndex].element.style.transform =
+            `translate(${pos.x}px, ${pos.y}px)`;
+
+        count++;
+
+        if(count === steps){
+            clearInterval(interval);
+
+            players[playerIndex].points += 5;
+
+            let currentTile =
+                players[playerIndex].position;
+
+            if(checkpointTiles.includes(currentTile)){
+                askQuestion(playerIndex);
+            }
+
+            updateScoreBoard();
+
+            checkWinner(playerIndex);
+
+            if(!gameOver){
+                currentTurn++;
+
+                if(currentTurn >= players.length){
+                    currentTurn = 0;
+                }
+
+                info.innerHTML =
+                    "Giliran Player " + (currentTurn+1);
+            }
+
+            isMoving = false;
+        }
+
+    },600);
+}
+
+function rollDice(){
+    if(players.length === 0){
+        alert("Mulai game dulu");
+        return;
+    }
+
+    if(isMoving || gameOver){
+        return;
+    }
+
+    let dice = Math.floor(Math.random()*6)+1;
+
+    info.innerHTML =
+        "Player " + (currentTurn+1) +
+        " mendapat angka " + dice;
+
+    movePlayer(currentTurn,dice);
+}
+</script>
+
+</body>
+</html>
