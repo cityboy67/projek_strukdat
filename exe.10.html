@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Techopoly 9x9</title>
+<title>TECHOPOLY - Monopoly Struktur Data</title>
 
 <style>
 
@@ -152,22 +152,34 @@ button:hover{
 }
 
 .player{
-    width:22px;
-    height:22px;
+    width:24px;
+    height:24px;
     border-radius:50%;
     position:absolute;
     z-index:999;
     transition:all .5s;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    color:white;
+    font-size:12px;
+    font-weight:bold;
+
+    border:2px solid white;
 }
 
 .player-info{
     position:absolute;
-    width:170px;
+    width:180px;
     background:white;
     border-radius:10px;
     padding:10px;
     box-shadow:0 0 10px rgba(0,0,0,0.2);
     font-size:14px;
+    max-height: 250px;
+    overflow-y: auto;
 }
 
 #p1box{
@@ -199,6 +211,13 @@ button:hover{
     height:180px;
     overflow:auto;
     box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+.property-list {
+    margin-top: 5px;
+    padding-left: 15px;
+    font-size: 11px;
+    color: #555;
 }
 
 </style>
@@ -235,6 +254,7 @@ Masukkan jumlah player
 <div class="center-area">
 <h1>TECHOPOLY</h1>
 <p>Monopoly Struktur Data</p>
+<p id="poolDisplay" style="font-size: 16px; margin-top: 10px; color: #e74c3c; font-weight: bold;">Free Parking Pool: 💰0</p>
 </div>
 
 </div>
@@ -249,6 +269,7 @@ const board = document.getElementById("board");
 const logBox = document.getElementById("log");
 const turnInfo = document.getElementById("turnInfo");
 const queueDisplay = document.getElementById("queueDisplay");
+const poolDisplay = document.getElementById("poolDisplay");
 
 const colors = ["red","blue","green","orange"];
 
@@ -256,10 +277,20 @@ let players = [];
 let turnQueue = [];
 let gameStarted = false;
 let isMoving = false;
+let freeParkingPool = 0; // Menampung denda kartu keuangan
 
-const targetMoney = 1000;
+const targetMoney = 1500; // Ditingkatkan sedikit agar persaingan list properti terasa
 
 const tiles = [];
+
+/* INDEX PENTING PADA TILE */
+const CYBER_JAIL_INDEX = 8;
+const FREE_PARKING_INDEX = 16;
+const GO_TO_JAIL_INDEX = 24;
+
+/* ====================================== */
+/* MEMBUAT TILE */
+/* ====================================== */
 
 function createTiles(){
 
@@ -378,8 +409,10 @@ tiles.push({
 
 name:names[i],
 type:type,
+
 price:100 + (i*5),
 rent:20 + (i*2),
+
 owner:null,
 
 x:path[i].x,
@@ -395,7 +428,16 @@ h:path[i].h
 
 createTiles();
 
+
+
+/* ====================================== */
+/* MEMBUAT BOARD */
+/* ====================================== */
+
 function createBoard(){
+
+// Bersihkan tile lama jika ada sebelum render ulang (menjaga area tengah tetap ada)
+document.querySelectorAll(".tile").forEach(e => e.remove());
 
 tiles.forEach(tile=>{
 
@@ -438,6 +480,12 @@ board.appendChild(div);
 
 createBoard();
 
+
+
+/* ====================================== */
+/* QUIZ STORY TELLING */
+/* ====================================== */
+
 const storyChallenges = [
 
 {
@@ -478,6 +526,44 @@ explanation:"Gerbong saling terhubung seperti linked list"
 
 ];
 
+
+
+/* ====================================== */
+/* KARTU KESEMPATAN */
+/* ====================================== */
+
+const chanceCards = [
+
+"🚀 Startup anda viral! +100 uang",
+"💻 Sistem server rusak. Denda -70 uang masuk kas Free Parking",
+"📈 Investasi AI berhasil. +120 uang",
+"🖨 Printer overload karena antrian panjang. Bayar denda 50 ke Free Parking",
+"⚡ Anda menemukan algoritma baru. Maju 3 langkah"
+
+];
+
+
+
+/* ====================================== */
+/* KARTU DANA UMUM */
+/* ====================================== */
+
+const communityCards = [
+
+"📦 Gudang data berhasil dirapikan. +80 uang",
+"🔌 Server mati mendadak. Denda -60 uang masuk kas Free Parking",
+"📊 Data pelanggan berhasil diurutkan. +90 uang",
+"🧠 Tim programmer menemukan bug besar. Denda -50 uang masuk kas Free Parking",
+"💰 Perusahaan mendapat investor baru. +100 uang"
+
+];
+
+
+
+/* ====================================== */
+/* START GAME */
+/* ====================================== */
+
 function startGame(){
 
 let count =
@@ -485,38 +571,49 @@ parseInt(document.getElementById("playerCount").value);
 
 if(isNaN(count) || count < 2 || count > 4){
 
-    alert("Player harus 2-4");
+alert("Player harus 2-4");
 
-    return;
+return;
 
 }
 
 players = [];
 turnQueue = [];
+freeParkingPool = 0;
+poolDisplay.innerHTML = "Free Parking Pool: 💰" + freeParkingPool;
+
+tiles.forEach(tile=>{
+
+tile.owner = null;
+
+});
 
 document.querySelectorAll(".player").forEach(e=>e.remove());
 
 for(let i=0;i<count;i++){
 
-    let player = document.createElement("div");
+let player = document.createElement("div");
 
-    player.classList.add("player");
+player.classList.add("player");
 
-    player.style.background = colors[i];
+player.style.background = colors[i];
 
-    board.appendChild(player);
+player.innerHTML = i+1;
 
-    players.push({
+board.appendChild(player);
 
-        name:"P"+(i+1),
-        money:500,
-        position:0,
-        properties:[],
-        element:player
+players.push({
 
-    });
+name:"P"+(i+1),
+money:500,
+position:0,
+properties:[],
+element:player,
+jailTurns: 0 // Menandakan sisa turn dipenjara
 
-    turnQueue.push(i);
+});
+
+turnQueue.push(i);
 
 }
 
@@ -529,56 +626,67 @@ updateUI();
 addLog("🎮 Game dimulai!");
 
 }
+
+
+
+/* ====================================== */
+/* UPDATE POSISI PLAYER */
+/* ====================================== */
+
 function updateAllPlayerPositions(){
 
-    tiles.forEach((tile,tileIndex)=>{
+tiles.forEach((tile,tileIndex)=>{
 
-        let playersInTile = [];
+let playersInTile = [];
 
-        players.forEach((player,index)=>{
+players.forEach((player,index)=>{
 
-            if(player.position === tileIndex){
+if(player.position === tileIndex){
 
-                playersInTile.push({
-                    player:player,
-                    index:index
-                });
-
-            }
-
-        });
-
-        playersInTile.forEach((data,order)=>{
-
-            let tile = tiles[tileIndex];
-
-            let playerSize = 22;
-
-            let spacing = 5;
-
-            let cols = 2;
-
-            let row = Math.floor(order / cols);
-
-            let col = order % cols;
-
-            let offsetX =
-                10 + (col * (playerSize + spacing));
-
-            let offsetY =
-                10 + (row * (playerSize + spacing));
-
-            data.player.element.style.left =
-                (tile.x + offsetX) + "px";
-
-            data.player.element.style.top =
-                (tile.y + offsetY) + "px";
-
-        });
-
-    });
+playersInTile.push({
+player:player,
+index:index
+});
 
 }
+
+});
+
+playersInTile.forEach((data,order)=>{
+
+let playerSize = 24;
+
+let spacing = 5;
+
+let cols = 2;
+
+let row = Math.floor(order / cols);
+
+let col = order % cols;
+
+let offsetX =
+10 + (col * (playerSize + spacing));
+
+let offsetY =
+10 + (row * (playerSize + spacing));
+
+data.player.element.style.left =
+(tile.x + offsetX) + "px";
+
+data.player.element.style.top =
+(tile.y + offsetY) + "px";
+
+});
+
+});
+
+}
+
+
+
+/* ====================================== */
+/* UPDATE UI */
+/* ====================================== */
 
 function updateUI(){
 
@@ -595,30 +703,57 @@ boxes.forEach(box=>box.innerHTML="");
 
 players.forEach((player,index)=>{
 
+// Membuat list HTML untuk list properti
+let propsHTML = "";
+if(player.properties.length > 0) {
+    propsHTML = "<ol class='property-list'>";
+    player.properties.forEach(p => {
+        propsHTML += `<li>${p}</li>`;
+    });
+    propsHTML += "</ol>";
+} else {
+    propsHTML = "<br><span style='font-size:11px; color:#aaa; padding-left:15px;'>Belum ada properti</span>";
+}
+
+let statusJail = player.jailTurns > 0 ? ` <span style="color:red;">(🔒 Jailed)</span>` : "";
+
 boxes[index].innerHTML =
 
 `
-<h3>${player.name}</h3>
+<h3 style="color:${colors[index]}; margin: 5px 0;">
+${player.name}${statusJail}
+</h3>
+
 💰 Money: ${player.money}<br>
-🏠 Properti: ${player.properties.length}
+🏠 Jumlah Properti: ${player.properties.length}
+<div style="font-weight:bold; margin-top:5px; font-size:12px;">Daftar Properti:</div>
+${propsHTML}
 `;
 
 });
 
-turnInfo.innerHTML =
-"🎯 Giliran " + players[turnQueue[0]].name;
+poolDisplay.innerHTML = "Free Parking Pool: 💰" + freeParkingPool;
 
-let queueText = "";
+if (turnQueue.length > 0) {
+    turnInfo.innerHTML = "🎯 Giliran " + players[turnQueue[0]].name;
 
-turnQueue.forEach(index=>{
-
-queueText += `[${players[index].name}] ➜ `;
-
-});
-
-queueDisplay.innerHTML = queueText;
+    let queueText = "";
+    turnQueue.forEach(index=>{
+        queueText +=
+        `<span style="color:${colors[index]}">
+        [${players[index].name}]
+        </span> ➜ `;
+    });
+    queueDisplay.innerHTML = queueText;
+}
 
 }
+
+
+
+/* ====================================== */
+/* LOG */
+/* ====================================== */
 
 function addLog(text){
 
@@ -628,11 +763,26 @@ logBox.scrollTop = logBox.scrollHeight;
 
 }
 
+
+
+/* ====================================== */
+/* ROLL DICE */
+/* ====================================== */
+
 function rollDice(){
 
 if(!gameStarted || isMoving) return;
 
 let currentPlayer = turnQueue[0];
+
+// Cek apakah player sedang berada di dalam Cyber Jail
+if(players[currentPlayer].jailTurns > 0) {
+    players[currentPlayer].jailTurns--;
+    addLog(`🔒 ${players[currentPlayer].name} berada di Cyber Jail dan kehilangan putaran ini! (Sisa hukuman: ${players[currentPlayer].jailTurns} turn)`);
+    alert(`🔒 ${players[currentPlayer].name} kehilangan turn saat ini karena dipenjara.`);
+    nextTurn();
+    return;
+}
 
 let dice = Math.floor(Math.random()*6)+1;
 
@@ -647,6 +797,12 @@ movePlayer(currentPlayer,dice);
 
 }
 
+
+
+/* ====================================== */
+/* MOVE PLAYER */
+/* ====================================== */
+
 function movePlayer(playerIndex,steps){
 
 isMoving = true;
@@ -655,37 +811,43 @@ let count = 0;
 
 let interval = setInterval(()=>{
 
-    players[playerIndex].position++;
+players[playerIndex].position++;
 
-    if(players[playerIndex].position >= tiles.length){
+if(players[playerIndex].position >= tiles.length){
 
-        players[playerIndex].position = 0;
+players[playerIndex].position = 0;
 
-        players[playerIndex].money += 150;
+players[playerIndex].money += 150;
 
-        addLog(
-            "💰 " +
-            players[playerIndex].name +
-            " melewati START (+150)"
-        );
+addLog(
+"💰 " +
+players[playerIndex].name +
+" melewati START (+150)"
+);
 
-    }
+}
 
-    updateAllPlayerPositions();
+updateAllPlayerPositions();
 
-    count++;
+count++;
 
-    if(count >= steps){
+if(count >= steps){
 
-        clearInterval(interval);
+clearInterval(interval);
 
-        processTile(playerIndex);
+processTile(playerIndex);
 
-    }
+}
 
 },400);
 
 }
+
+
+
+/* ====================================== */
+/* PROCESS TILE */
+/* ====================================== */
 
 function processTile(playerIndex){
 
@@ -697,6 +859,32 @@ players[playerIndex].name +
 " berada di " +
 tile.name
 );
+
+/* GO TO JAIL TILE MECHANIC */
+if(players[playerIndex].position === GO_TO_JAIL_INDEX) {
+    alert(`🚨 Ouch! ${players[playerIndex].name} melakukan illegal hacking! Anda dikirim langsung ke Cyber Jail.`);
+    players[playerIndex].position = CYBER_JAIL_INDEX; // Pindah langsung ke Cyber Jail
+    players[playerIndex].jailTurns = 1; // Kehilangan 1 putaran berikutnya
+    addLog(`🚨 ${players[playerIndex].name} dipindahkan ke Cyber Jail dan terkena skip status.`);
+    updateAllPlayerPositions();
+    nextTurn();
+    return;
+}
+
+/* FREE PARKING TILE MECHANIC */
+if(players[playerIndex].position === FREE_PARKING_INDEX) {
+    if(freeParkingPool > 0) {
+        alert(`🎁 FREE PARKING! ${players[playerIndex].name} mendapatkan semua bonus kas terkumpul sebesar 💰${freeParkingPool}!`);
+        players[playerIndex].money += freeParkingPool;
+        addLog(`🎁 ${players[playerIndex].name} mengambil dana Free Parking sebesar +${freeParkingPool}`);
+        freeParkingPool = 0;
+    } else {
+        alert(`🟢 Anda beristirahat dengan aman di Free Parking. Kas pool saat ini kosong.`);
+        addLog(`🟢 ${players[playerIndex].name} singgah di Free Parking.`);
+    }
+}
+
+/* PROPERTY */
 
 if(tile.type === "property"){
 
@@ -729,11 +917,19 @@ tile.name
 );
 
 }
+else{
+
+alert("Uang tidak cukup");
 
 }
 
 }
-else if(tile.owner !== playerIndex){
+
+}
+else if(
+tile.owner !== null &&
+tile.owner !== playerIndex
+){
 
 players[playerIndex].money -= tile.rent;
 
@@ -748,17 +944,148 @@ players[tile.owner].name
 
 }
 
-}
 
-if(Math.random() < 0.35){
+
+/* QUIZ HANYA DI PROPERTY */
+
+if(Math.random() < 0.45){
 
 showChallenge(playerIndex);
 
 }
 
+}
+
+
+
+/* KESEMPATAN */
+
+if(tile.type === "chance"){
+
+processChance(playerIndex);
+
+}
+
+
+
+/* DANA UMUM */
+
+if(tile.type === "community"){
+
+processCommunity(playerIndex);
+
+}
+
+
+
+/* SAFE ZONE & JAIL VISIT ONLY */
+
+if(
+tile.type === "safe" ||
+tile.type === "start" ||
+tile.type === "jail"
+){
+    if(players[playerIndex].position === CYBER_JAIL_INDEX && players[playerIndex].jailTurns === 0) {
+        addLog("🟢 Safe Zone: Berkunjung saja ke Cyber Jail.");
+    } else if (players[playerIndex].position !== FREE_PARKING_INDEX) {
+        addLog("🟢 Safe Zone");
+    }
+}
+
+
+
 nextTurn();
 
 }
+
+
+
+/* ====================================== */
+/* PROCESS KESEMPATAN */
+/* ====================================== */
+
+function processChance(playerIndex){
+
+let card =
+chanceCards[Math.floor(Math.random()*chanceCards.length)];
+
+alert("🎴 KESEMPATAN\n\n" + card);
+
+addLog("🎴 " + card);
+
+if(card.includes("+100"))
+players[playerIndex].money += 100;
+
+if(card.includes("+120"))
+players[playerIndex].money += 120;
+
+if(card.includes("-70")) {
+    players[playerIndex].money -= 70;
+    freeParkingPool += 70;
+}
+
+if(card.includes("Bayar denda 50")) {
+    players[playerIndex].money -= 50;
+    freeParkingPool += 50;
+}
+
+if(card.includes("Maju 3")){
+
+players[playerIndex].position += 3;
+
+if(players[playerIndex].position >= tiles.length){
+
+players[playerIndex].position %= tiles.length;
+
+}
+
+updateAllPlayerPositions();
+
+}
+
+}
+
+
+
+/* ====================================== */
+/* PROCESS DANA UMUM */
+/* ====================================== */
+
+function processCommunity(playerIndex){
+
+let card =
+communityCards[Math.floor(Math.random()*communityCards.length)];
+
+alert("📦 DANA UMUM\n\n" + card);
+
+addLog("📦 " + card);
+
+if(card.includes("+80"))
+players[playerIndex].money += 80;
+
+if(card.includes("+90"))
+players[playerIndex].money += 90;
+
+if(card.includes("+100"))
+players[playerIndex].money += 100;
+
+if(card.includes("-60")) {
+    players[playerIndex].money -= 60;
+    freeParkingPool += 60;
+}
+
+if(card.includes("-50")) {
+    players[playerIndex].money -= 50;
+    freeParkingPool += 50;
+}
+
+}
+
+
+
+/* ====================================== */
+/* QUIZ */
+/* ====================================== */
 
 function showChallenge(playerIndex){
 
@@ -773,8 +1100,8 @@ challenge.question +
 
 "\n\nOK = Jawab Tantangan" +
 
-"\nCancel = Bayar " +
-challenge.penalty
+"\nCancel = Bayar Denda " +
+challenge.penalty + " ke Free Parking"
 
 );
 
@@ -789,7 +1116,7 @@ challenge.answer.toLowerCase()
 ){
 
 alert(
-"BENAR!\n\n" +
+"✅ BENAR!\n\n" +
 challenge.explanation
 );
 
@@ -805,11 +1132,12 @@ players[playerIndex].name +
 else{
 
 alert(
-"SALAH!\n\n" +
-challenge.explanation
+"❌ SALAH!\n\n" +
+challenge.explanation + `. Denda dialokasikan ke Free Parking.`
 );
 
 players[playerIndex].money -= challenge.penalty;
+freeParkingPool += challenge.penalty;
 
 addLog(
 "❌ " +
@@ -823,16 +1151,23 @@ players[playerIndex].name +
 else{
 
 players[playerIndex].money -= challenge.penalty;
+freeParkingPool += challenge.penalty;
 
 addLog(
 "💸 " +
 players[playerIndex].name +
-" skip tantangan"
+" skip tantangan, denda masuk Free Parking"
 );
 
 }
 
 }
+
+
+
+/* ====================================== */
+/* NEXT TURN */
+/* ====================================== */
 
 function nextTurn(){
 
@@ -846,13 +1181,19 @@ isMoving = false;
 
 }
 
+
+
+/* ====================================== */
+/* CEK PEMENANG */
+/* ====================================== */
+
 function checkWinner(){
 
 players.forEach(player=>{
 
 if(player.money >= targetMoney){
 
-alert(player.name + " MENANG!");
+alert(player.name + " MENANG karena mencapai batas target finansial!");
 
 gameStarted = false;
 
