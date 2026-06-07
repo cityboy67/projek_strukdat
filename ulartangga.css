@@ -11,10 +11,17 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #222;
+  
+  /* --- KODE BACKGROUND BARU --- */
+  background-image: url('assets/bgulartanga.jpeg'); /* Memanggil gambar dari folder assets */
+  background-size: cover; /* Memastikan gambar menutupi seluruh layar tanpa terdistorsi */
+  background-position: center; /* Memastikan gambar selalu berada di tengah */
+  background-repeat: no-repeat; /* Mencegah gambar berulang/berjejer jika layar terlalu besar */
+  background-attachment: fixed; /* Membuat background diam jika di-scroll (opsional) */
+  /* ---------------------------- */
+
   font-family: 'Arial Black', Arial, sans-serif; 
 }
-
 /* Mengatur ukuran dan tata letak grid untuk papan ular tangga */
 .board {
   width: 90vmin;
@@ -125,9 +132,8 @@ body {
   bottom: 0; 
   right: -160px; 
   padding: 15px 25px;
-  background-color: #4B75FE;
+  background-color: #00c8ff;
   color: white;
-  border: 4px solid black;
   border-radius: 10px;
   font-family: 'Arial Black', Arial, sans-serif;
   font-weight: 900;
@@ -234,13 +240,12 @@ body {
 /* --- KOTAK DADU (SIDE PANEL) --- */
 .side-panel {
   position: absolute;
-  top: 15%; 
-  right: -200px; /* Melayang murni di luar papan sebelah kanan */
+  top: 50%; 
+  right: -165px; /* Melayang murni di luar papan sebelah kanan */
   
   width: 160px;
-  background: #8A2BE2; /* Warna ungu */
+  background: #00ccff; /* Warna ungu */
   border-radius: 15px;
-  border: 4px solid #fff;
   padding: 15px;
   display: flex;
   flex-direction: column;
@@ -264,8 +269,8 @@ body {
 }
 
 #btn-roll {
-  background: #fdd749;
-  color: black;
+  background: #9dff00;
+  color: rgb(0, 0, 0);
   border: 3px solid black;
   font-weight: 900;
   font-size: 18px;
@@ -278,7 +283,7 @@ body {
 
 #btn-roll:hover {
   transform: scale(1.05);
-  background: #ffea8c;
+  background: #26ff00;
 }
 
 #btn-roll:disabled {
@@ -286,4 +291,124 @@ body {
   color: #555;
   cursor: not-allowed;
   transform: none;
+}
+
+/* --- POPUP MATERI (KOTAK UNGU) --- */
+.materi-box {
+  background: #8A2BE2; /* Warna ungu mirip dengan UI dadu */
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  width: 80%; /* Agar tidak terlalu mentok ke pinggir layar */
+  max-width: 600px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  border: 4px solid black;
+}
+
+#materi-judul {
+  font-size: 36px;
+  color: black;
+  margin-bottom: 20px;
+  text-transform: capitalize;
+}
+
+#materi-teks {
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  color: black;
+  font-weight: bold;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+#btn-materi-tutup {
+  background: white;
+  color: black;
+  border: none;
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-size: 20px;
+  padding: 10px 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 80%;
+}
+
+#btn-materi-tutup:hover {
+  background: #ddd;
+  transform: scale(1.05);
+}
+
+/* --- NOTIFIKASI EXTRA ROLL --- */
+#notif-extra-roll, #notif-game {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  z-index: 2000;
+  animation: slideUpFade 3s forwards;
+}
+
+@keyframes slideUpFade {
+  0% { bottom: -50px; opacity: 0; }
+  10% { bottom: 50px; opacity: 1; }
+  80% { bottom: 50px; opacity: 1; }
+  100% { bottom: 60px; opacity: 0; display: none; }
+}
+
+/* --- POPUP PERTANYAAN (PILIHAN GANDA) --- */
+.opsi-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.opsi-btn {
+  background: white;
+  color: black;
+  border: 3px solid black;
+  padding: 15px;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: left; /* Teks rata kiri */
+}
+
+.opsi-btn:hover {
+  background: #eee;
+}
+
+/* Warna saat tombol opsi dipilih */
+.opsi-btn.selected {
+  background: #fdd749; /* Warna kuning khas tombol dadu Anda */
+  border-color: #ff0000;
+  transform: scale(1.02);
+}
+
+#btn-tanya-jawab {
+  background: #4B75FE;
+  color: white;
+  border: 3px solid black;
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-size: 20px;
+  padding: 12px 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 80%;
+}
+
+#btn-tanya-jawab:hover {
+  background: #2B55DE;
+  transform: scale(1.05);
 }

@@ -10,6 +10,14 @@
 
   <audio id="sfx-dice" src="assets/sound effect/efek-roll-dice.mp3"></audio>
   <audio id="sfx-step" src="assets/sound effect/efek-melangkah.mp3"></audio>
+  <audio id="sfx-materi" src="assets/sound effect/materi.mp3"></audio>
+  <audio id="sfx-naik-tangga" src="assets/sound effect/efek-naik-tangga.mp3"></audio>
+  <audio id="sfx-gagal-tangga" src="assets/sound effect/efek-gagal-naik-tangga.mp3"></audio>
+  <audio id="sfx-turun-ular" src="assets/sound effect/efek-turun-ular.mp3"></audio>
+  <audio id="sfx-selamat-ular" src="assets/sound effect/efek-selamat-dari-ular.mp3"></audio>
+  <audio id="sfx-gagal-finish" src="assets/sound effect/gagal-finish.mp3"></audio>
+  <audio id="sfx-menang" src="assets/sound effect/efek-menang.mp3"></audio>
+  <audio id="bgm-game" src="assets/sound effect/bgm-ular-tangga.mp3" loop></audio>
 
   <div class="game-wrapper">
     <div class="board" id="board"></div>
@@ -18,7 +26,7 @@
     <button class="btn-mulai" id="btn-mulai">MULAI</button>
 
     <div class="side-panel hidden" id="side-panel">
-      <div class="turn-indicator">Giliran:<br><span id="current-player" style="color: #fdd749; font-size: 20px;">Player 1</span></div>
+      <div class="turn-indicator">Giliran:<br><span id="current-player" style="color: #ffffff; font-size: 20px;">Player 1</span></div>
       <img id="dice-img" src="assets/dadu/dadu-1.png" alt="Dadu">
       <button id="btn-roll">ROLL</button>
     </div>
@@ -36,6 +44,38 @@
         </select>
         <button id="btn-gas" class="btn-abu">Gas</button>
       </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY POPUP MATERI -->
+  <div class="overlay hidden" id="popup-materi">
+    <div class="materi-box">
+      <h2 id="materi-judul">judul materi</h2>
+      <p id="materi-teks">isi materi</p>
+      <button id="btn-materi-tutup">saya paham</button>
+    </div>
+  </div>
+
+  <!-- NOTIFIKASI EXTRA ROLL -->
+  <div id="notif-extra-roll" class="hidden">
+    mendapatkan extra 1 roll dice
+  </div>
+
+  <div id="notif-extra-roll" class="hidden">
+    mendapatkan extra 1 roll dice
+  </div>
+
+  <div id="notif-game" class="hidden">
+    Pesan di sini
+  </div>
+
+  <div class="overlay hidden" id="popup-pertanyaan">
+    <div class="materi-box"> <h2 id="tanya-judul">TANTANGAN!</h2>
+      <p id="tanya-teks">teks pertanyaan akan muncul di sini</p>
+      
+      <div id="tanya-opsi-container" class="opsi-container"></div>
+      
+      <button id="btn-tanya-jawab">JAWAB</button>
     </div>
   </div>
 
