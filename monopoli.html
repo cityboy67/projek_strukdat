@@ -7,346 +7,420 @@
 
 <style>
 /* ==========================================================================
-   1. CORE ARCHITECTURE & ANTI-SCROLL ENGINE
+   1. CORE STYLE & LAYOUT ENGINE (ZERO SCROLL)
    ========================================================================== */
-html, body {
+body {
     margin: 0;
     padding: 0;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden; /* Mencegah scrollbar muncul sama sekali */
-    background: radial-gradient(circle, #1e272e 0%, #0f141c 100%);
+    background: radial-gradient(circle at center, #1e272e 0%, #090d14 100%);
     color: #ffffff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    box-sizing: border-box;
-}
-
-/* Wadah utama pembungkus seluruh elemen workspace */
-.game-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    height: 100vh;
     width: 100vw;
-    height: 100vh;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-/* Container fleksibel yang menjaga proporsi koordinat game tetap presisi */
-.game-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-    height: 100%;
-    max-width: 1380px;
-    max-height: 920px;
-    transform-origin: center center;
-    box-sizing: border-box;
-}
-
-/* Kolom vertikal penampung box informasi pemain di sisi kiri & kanan */
-.sidebar-column {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 220px;
-    height: 900px; /* Sejajar sempurna dengan tinggi mutlak papan */
-    gap: 20px;
-    box-shrink: 0;
-    box-sizing: border-box;
-}
-
-/* ==========================================================================
-   2. BOARD & TILE GEOMETRY SYSTEM (FIX OVERFLOW & CLIPPING)
-   ========================================================================== */
-.board {
-    width: 900px;
-    height: 900px;
-    background: #222f3e;
-    border: 5px solid #00d2d3;
-    position: relative;
-    box-shadow: 0 0 30px rgba(0, 210, 211, 0.3);
-    flex-shrink: 0;
-    box-sizing: border-box;
-}
-
-.tile {
-    position: absolute;
-    border: 1px solid #10ac84;
-    box-sizing: border-box; /* Mengunci padding agar tidak merusak lebar asli */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-size: 11px; /* Ukuran font diseragamkan agar ideal membaca materi */
-    font-weight: bold;
-    padding: 6px;
-    color: #ffffff;
-    word-wrap: break-word; /* Memaksa kata panjang melipat ke bawah */
-    word-break: break-word;
-    line-height: 1.2; /* Jarak baris rapat agar teks tidak terpotong ke luar kotak */
     overflow: hidden;
+    box-sizing: border-box;
 }
 
-.corner {
-    width: 140px;
-    height: 140px;
-    background: #341f97;
-    color: #ffffff;
-    border: 1px solid #5f27cd;
-    font-size: 13px;
-}
-
-.horizontal { width: 88px; height: 140px; }
-.vertical { width: 140px; height: 88px; }
-
-.property { background: #2e86de; }
-.chance { background: #833471; }
-.community { background: #e15f41; }
-.safe { background: #576574; }
-.jail { background: #ee5253; }
-
-/* ==========================================================================
-   3. INTEGRATED CENTER HUD AREA
-   ========================================================================== */
-.center-area {
-    position: absolute;
-    width: 532px;
-    height: 532px;
-    left: 184px;
-    top: 184px;
-    background: #1e272e;
-    border: 5px dashed #00d2d3;
+.app-wrapper {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+    width: 100%;
+    height: 100vh;
     padding: 15px;
     box-sizing: border-box;
+    gap: 15px;
 }
 
-.center-main-title {
-    font-size: 32px;
+/* ==========================================================================
+   2. SIDEBAR PANEL SYSTEM (LEFT AREA)
+   ========================================================================== */
+.sidebar {
+    width: 360px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+    min-height: 0; /* Anti Overflow */
+}
+
+.brand-header {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 210, 211, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 0 15px rgba(0, 210, 211, 0.1);
+}
+
+.brand-header h1 {
     margin: 0;
+    font-size: 22px;
     color: #00d2d3;
-    text-shadow: 0 0 10px rgba(0, 210, 211, 0.6);
-    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 210, 211, 0.4);
     letter-spacing: 1px;
 }
 
-.center-subtitle {
+.brand-header p {
+    margin: 3px 0 0 0;
     font-size: 12px;
     color: #84817a;
-    margin: 2px 0 8px 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    font-weight: 500;
 }
 
-.center-status-zone {
-    width: 100%;
+/* Glassmorphism Panel Base */
+.panel {
+    background: rgba(44, 62, 80, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.control-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group {
+    display: flex;
+    gap: 8px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #34495e;
+    background: #1e272e;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
     text-align: center;
+    outline: none;
+    transition: border 0.3s ease;
+}
+
+input:focus {
+    border-color: #00d2d3;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background: #10ac84;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 0 #0b8463;
+    transition: all 0.1s ease;
+}
+
+button:hover { background: #1dd1a1; }
+button:active { transform: translateY(2px); box-shadow: 0 2px 0 #0b8463; }
+button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; transform: none; opacity: 0.6; }
+
+#btnRoll {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    background: #ff9f43;
+    box-shadow: 0 4px 0 #cf751f;
+}
+#btnRoll:hover { background: #ffb167; }
+#btnRoll:active { transform: translateY(2px); box-shadow: 0 2px 0 #cf751f; }
+
+.state-panel {
+    text-align: center;
+    background: rgba(255, 159, 67, 0.05);
+    border: 1px solid rgba(255, 159, 67, 0.2);
 }
 
 .turn-box {
     font-size: 16px;
     font-weight: bold;
     color: #ff9f43;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 
 .queue-box {
     font-size: 13px;
     color: #c8d6e5;
-    margin-bottom: 8px;
 }
 
-.center-controls-zone {
-    display: flex;
+/* Dashboard Grid Player Cards */
+.player-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin-bottom: 5px;
 }
 
-.center-controls-zone input {
-    padding: 8px;
-    width: 90px;
-    border: 2px solid #34495e;
-    background: #2c3e50;
-    color: white;
-    border-radius: 5px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.center-controls-zone button {
-    padding: 8px 15px;
-    border: none;
-    background: #10ac84;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 13px;
-    box-shadow: 0 4px 0 #0b8463;
-    transition: all 0.1s ease;
-}
-.center-controls-zone button:hover { background: #1dd1a1; }
-.center-controls-zone button:active { transform: translateY(3px); box-shadow: none; }
-.center-controls-zone button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
-
-.center-visual-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-#poolDisplay {
-    font-size: 14px;
-    color: #ffff2e;
-    font-weight: bold;
-    margin: 0;
-}
-
-.dice-visual {
-    font-size: 32px;
-    background: #2c3e50;
-    padding: 4px 14px;
-    border: 2px solid #00d2d3;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    color: white;
-    margin: 0;
-}
-
-/* Box Log Aktivitas tersemat di bawah center area */
-.log {
-    width: 100%;
-    background: #151f28;
-    border: 1px solid #34495e;
-    border-radius: 8px;
-    padding: 10px;
-    height: 125px;
-    overflow-y: auto;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-    color: #c8d6e5;
-    font-size: 12px;
-    text-align: left;
-    margin: 5px 0 0 0;
-    box-sizing: border-box;
-}
-
-/* ==========================================================================
-   4. COMPACT SIDEBAR COMPONENT DESIGN
-   ========================================================================== */
 .player-info {
-    width: 100%;
-    height: 440px; /* Dua box seimbang mengisi porsi sidebar vertikal */
-    background: #2c3e50;
-    border: 2px solid #34495e;
+    background: rgba(22, 32, 43, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    font-size: 13px;
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    max-height: 125px;
     box-sizing: border-box;
-    overflow-y: auto;
 }
 
 .player-info h3 {
-    margin-top: 0;
-    margin-bottom: 6px;
-    font-size: 15px;
+    font-size: 14px;
+    margin: 0 0 4px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.property-list { margin-top: 4px; padding-left: 15px; font-size: 11px; color: #ffdd59; }
-.audio-control { font-size: 12px; color: #ff9f43; cursor: pointer; text-decoration: underline; font-weight: bold; }
+.property-container {
+    flex-1: 1;
+    overflow-y: auto;
+    margin-top: 4px;
+    padding-right: 2px;
+}
 
-/* Token Pemain di atas papan */
+.property-list {
+    margin: 2px 0;
+    padding-left: 14px;
+    font-size: 10.5px;
+    color: #ffdd59;
+}
+
+/* Custom Scrollbar */
+.property-container::-webkit-scrollbar,
+.log::-webkit-scrollbar {
+    width: 4px;
+}
+.property-container::-webkit-scrollbar-thumb,
+.log::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.log-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Penting agar log bisa scroll di dalam flex */
+    background: rgba(15, 25, 35, 0.6);
+    border: 1px solid rgba(52, 73, 94, 0.5);
+}
+
+.log-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #84817a;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.log {
+    flex: 1;
+    overflow-y: auto;
+    color: #c8d6e5;
+    font-size: 11.5px;
+    line-height: 1.5;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* ==========================================================================
+   3. BOARD SYSTEM CONTAINER (RIGHT VIEWPORT)
+   ========================================================================== */
+.board-viewport {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
+/* Canvas Board Tetap 900x900 secara internal, diskalakan via JS Engine */
+.board {
+    width: 900px;
+    height: 900px;
+    background: #1b2631;
+    border: 6px solid #00d2d3;
+    position: relative;
+    box-shadow: 0 0 35px rgba(0, 210, 211, 0.25);
+    flex-shrink: 0;
+    transform-origin: center center;
+}
+
+.tile {
+    position: absolute;
+    border: 1px solid rgba(16, 172, 132, 0.4);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 6px;
+    color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.tile:hover {
+    filter: brightness(1.15);
+    box-shadow: inset 0 0 12px rgba(0, 210, 211, 0.3);
+}
+
+.corner {
+    width: 140px;
+    height: 140px;
+    background: #2c1a76;
+    color: #ffffff;
+    border: 1px solid #5f27cd;
+}
+
+.horizontal { width: 88px; height: 140px; }
+.vertical { width: 140px; height: 88px; }
+
+.property { background: #246ebb; border-top: 5px solid #2ecc71; }
+.chance { background: #6d265e; }
+.community { background: #b84a30; }
+.safe { background: #4b5661; }
+.jail { background: #c23616; }
+
+.center-area {
+    position: absolute;
+    width: 532px;
+    height: 532px;
+    left: 184px;
+    top: 184px;
+    background: #111921;
+    border: 4px dashed rgba(0, 210, 211, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+}
+
+.center-area h1 { font-size: 50px; margin: 0; color: #00d2d3; text-shadow: 0 0 15px rgba(0, 210, 211, 0.6); font-weight: 900; }
+.center-area p { font-size: 18px; color: #84817a; margin: 4px 0; font-weight: 500; }
+
+.dice-visual {
+    font-size: 48px;
+    margin-top: 20px;
+    background: #1e272e;
+    padding: 8px 24px;
+    border: 3px solid #00d2d3;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+    color: white;
+    transition: transform 0.1s ease;
+}
+
 .player {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     position: absolute;
-    z-index: 999;
-    transition: all .3s ease-out;
+    z-index: 99;
+    transition: all .35s cubic-bezier(0.25, 1, 0.5, 1);
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 11px;
+    font-weight: 900;
     border: 2px solid white;
-    box-shadow: 0 0 8px rgba(255,255,255,0.8);
+    box-shadow: 0 0 10px rgba(255,255,255,0.8);
 }
-.img-bg2{
-    position: absolute;
-    width: 100%;
+
+.audio-control { 
+    margin-top: 15px; 
+    font-size: 12px; 
+    color: #ff9f43; 
+    cursor: pointer; 
+    text-decoration: none; 
+    font-weight: bold; 
+    background: rgba(255, 159, 67, 0.1);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 159, 67, 0.3);
+    transition: all 0.2s ease;
+}
+.audio-control:hover {
+    background: rgba(255, 159, 67, 0.2);
+    box-shadow: 0 0 10px rgba(255, 159, 67, 0.3);
 }
 </style>
 </head>
 <body>
-<img class="img-bg2" src="assets/background/1142465(1).jpg">
-<div class="game-wrapper">
-    <div class="game-container">
-        
-        <div class="sidebar-column">
-            <div id="p1box" class="player-info"></div>
-            <div id="p3box" class="player-info"></div>
+
+<div class="app-wrapper">
+    <div class="sidebar">
+        <div class="brand-header">
+            <h1>🎲 TECHOPOLY</h1>
+            <p>Monopoly Struktur Data</p>
         </div>
 
-        <div class="board" id="board">
-            <div class="center-area">
-                <div style="text-align: center;">
-                    <h1 class="center-main-title">TECHOPOLY</h1>
-                    <div class="center-subtitle">Monopoly Struktur Data</div>
-                </div>
-                
-                <div class="center-status-zone">
-                    <div class="turn-box" id="turnInfo">Masukkan jumlah player</div>
-                    <div class="queue-box" id="queueDisplay"></div>
-                </div>
-
-                <div class="center-controls-zone">
-                    <input type="number" id="playerCount" min="2" max="4" placeholder="2-4 Player">
-                    <button id="btnStart" onclick="startGame()">Start Game</button>
-                    <button id="btnRoll" onclick="rollDice()">🎲 Roll Dice</button>
-                </div>
-
-                <div class="center-visual-row">
-                    <p id="poolDisplay">Crypto Faucet Pool: 💰0</p>
-                    <div id="diceVisual" class="dice-visual">🎲</div>
-                </div>
-
-                <div class="audio-control" onclick="toggleBGM()">🎵 Aktifkan/Mute Backsound</div>
-
-                <div class="log" id="log"></div>
+        <div class="panel control-panel">
+            <div class="input-group">
+                <input type="number" id="playerCount" min="2" max="4" value="2" placeholder="2-4 Player">
+                <button id="btnStart" onclick="startGame()">Start Game</button>
             </div>
+            <button id="btnRoll" onclick="rollDice()">🎲 Roll Dice</button>
         </div>
 
-        <div class="sidebar-column">
+        <div class="panel state-panel">
+            <div class="turn-box" id="turnInfo">Masukkan jumlah player</div>
+            <div class="queue-box" id="queueDisplay"></div>
+        </div>
+
+        <div class="player-grid">
+            <div id="p1box" class="player-info"></div>
             <div id="p2box" class="player-info"></div>
+            <div id="p3box" class="player-info"></div>
             <div id="p4box" class="player-info"></div>
         </div>
 
+        <div class="panel log-panel">
+            <div class="log-title">Sistem Log Aktif</div>
+            <div class="log" id="log"></div>
+        </div>
+    </div>
+
+    <div class="board-viewport" id="boardContainer">
+        <div class="board" id="board">
+            <div class="center-area">
+                <h1>TECHOPOLY</h1>
+                <p>Monopoly Struktur Data</p>
+                <p id="poolDisplay" style="font-size: 16px; margin-top: 10px; color: #ffff2e; font-weight: bold;">Crypto Faucet Pool: 💰0</p>
+                <div id="diceVisual" class="dice-visual">🎲</div>
+                <div class="audio-control" onclick="toggleBGM()">🎵 Aktifkan/Mute Backsound</div>
+            </div>
+        </div>
     </div>
 </div>
 
-<audio id="bgm" loop src="/assets/sound effect/TIKI TIKI Slowed.mp3.mp3" preload="auto"></audio>
+<audio id="bgm" loop src="assets/sound effect/TIKI TIKI Slowed.mp3.mp3" preload="auto"></audio>
 <audio id="sfxDice" src="assets/sound effect/efek-roll-dice.mp3" preload="auto"></audio>
 <audio id="sfxStep" src="assets/sound effect/efek-melangkah.mp3" preload="auto"></audio>
-<audio id="sfxCorrect" src="https://glichet.github.io/hosting-assets/correct_chime.mp3" preload="auto"></audio>
-<audio id="sfxWrong" src="https://glichet.github.io/hosting-assets/wrong_buzz.mp3" preload="auto"></audio>
+<audio id="sfxCorrect" src="/assets/sound effect/family-feud-good-answer.mp3" preload="auto"></audio>
+<audio id="sfxWrong" src="/assets/sound effect/nope-construction-worker-tf2-gaming-sound-effect-hd_ai7HT0p.mp3" preload="auto"></audio>
+
+<audio id="sfxFaucet" src="assets/sound effect/achievements2.mp3" preload="auto"></audio>
+<audio id="sfxBuy" src="assets/sound effect/getmoney.mp3" preload="auto"></audio>
+<audio id="sfxCard" src="assets/sound effect/achievements.mp3" preload="auto"></audio>
+<audio id="sfxWin" src="assets/sound effect/windah-absolute-cinema.mp3" preload="auto"></audio>
+<audio id="sfxLose" src="assets/sound effect/kucing-ketawa.mp3" preload="auto"></audio>
 
 <script>
-// Seluruh referensi DOM dan Logika Engine asli dipertahankan 100% tanpa modifikasi fungsionalitas
 const board = document.getElementById("board");
 const logBox = document.getElementById("log");
 const turnInfo = document.getElementById("turnInfo");
@@ -355,11 +429,19 @@ const poolDisplay = document.getElementById("poolDisplay");
 const diceVisual = document.getElementById("diceVisual");
 const btnRoll = document.getElementById("btnRoll");
 
+// Audio Selector Utama
 const bgm = document.getElementById("bgm");
 const sfxDice = document.getElementById("sfxDice");
 const sfxStep = document.getElementById("sfxStep");
 const sfxCorrect = document.getElementById("sfxCorrect");
 const sfxWrong = document.getElementById("sfxWrong");
+
+// Audio Selector Slot Baru Anda
+const sfxFaucet = document.getElementById("sfxFaucet");
+const sfxBuy = document.getElementById("sfxBuy");
+const sfxCard = document.getElementById("sfxCard");
+const sfxWin = document.getElementById("sfxWin");
+const sfxLose = document.getElementById("sfxLose");
 
 const colors = ["#ff4d4d", "#3498db", "#2ecc71", "#f1c40f"];
 const diceFaces = ["🎲", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
@@ -377,11 +459,19 @@ const CYBER_JAIL_INDEX = 8;
 const FREE_PARKING_INDEX = 16;
 const GO_TO_JAIL_INDEX = 24;
 
+// Atur Volume Suara
 bgm.volume = 0.2;
 sfxDice.volume = 0.6;
 sfxStep.volume = 0.5;
 sfxCorrect.volume = 0.6;
 sfxWrong.volume = 0.6;
+
+// Atur Volume Suara Slot Baru
+sfxFaucet.volume = 0.6;
+sfxBuy.volume = 0.6;
+sfxCard.volume = 0.6;
+sfxWin.volume = 0.7;
+sfxLose.volume = 0.7;
 
 function toggleBGM() {
     if (bgm.paused) {
@@ -412,7 +502,7 @@ function createTiles(){
     path.push({x:760,y:0,w:140,h:140});
     for(let i=0;i<7;i++) { path.push({x:760, y:140+(i*88), w:140, h:88}); }
 
-    for(let i=0; i<32; i++){
+    for(let i=0;i<32;i++){
         let type = "property";
         if(names[i].includes("Dana")) type = "community";
         if(names[i].includes("Kesempatan")) type = "chance";
@@ -457,7 +547,9 @@ function createBoard(){
 }
 createBoard();
 
+/* 2. BANK SOAL ASLI */
 const storyChallenges = [
+    // --- QUEUE / FIFO (5 Soal) ---
     { 
         question: "Di sebuah bank digital, pelanggan yang datang lebih dulu selalu dilayani terlebih dahulu agar sistem tetap adil. Sistem apakah ini?\n\nA. FIFO\nB. LIFO\nC. Random Access", 
         answer:"A", penalty:30, reward:80, explanation:"Benar! Bank menggunakan konsep antrean FIFO (First In First Out)." 
@@ -478,6 +570,8 @@ const storyChallenges = [
         question: "Pada Queue, jika elemen X masuk pada urutan ke-3, maka elemen X tersebut akan keluar pada urutan ke-berapa?\n\nA. Urutan ke-1\nB. Urutan terakhir\nC. Urutan ke-3", 
         answer:"C", penalty:25, reward:75, explanation:"Benar! Karena FIFO, urutan masuk sama dengan urutan keluar." 
     },
+
+    // --- STACK / LIFO (5 Soal) ---
     { 
         question: "Seorang koki menumpuk piring bersih di dapur. Saat digunakan, piring paling atas diambil lebih dulu. Konsep apakah ini?\n\nA. LIFO\nB. FIFO\nC. Linear Search", 
         answer:"A", penalty:30, reward:80, explanation:"Benar! Tumpukan piring menerapkan konsep LIFO (Last In First Out)." 
@@ -498,6 +592,8 @@ const storyChallenges = [
         question: "Kondisi eror ketika kita melakukan operasi mengambil data (POP) pada tumpukan Stack yang kosong disebut...?\n\nA. Underflow\nB. Overflow\nC. Crash Error", 
         answer:"A", penalty:30, reward:80, explanation:"Benar! Mengambil data dari wadah kosong menyebabkan Underflow." 
     },
+
+    // --- SORTING (5 Soal) ---
     { 
         question: "Proses menyusun dan mengurutkan data acak dari nilai terkecil ke terbesar atau sebaliknya disebut...?\n\nA. Searching\nB. Sorting\nC. Slicing", 
         answer:"B", penalty:25, reward:70, explanation:"Benar! Mengurutkan data disebut proses sorting." 
@@ -518,6 +614,8 @@ const storyChallenges = [
         question: "Bila array angka [3, 1, 4] diurutkan secara Ascending, angka berapakah yang akan menempati indeks pertama (indeks 0)?\n\nA. 3\nB. 1\nC. 4", 
         answer:"B", penalty:20, reward:70, explanation:"Benar! Setelah diurutkan menjadi [1, 3, 4], jadi indeks 0 adalah angka 1." 
     },
+
+    // --- LINKED LIST (5 Soal) ---
     { 
         question: "Rangkaian gerbong kereta api yang saling terhubung satu sama lain mirip dengan visualisasi struktur data...?\n\nA. Linked List\nB. Stack\nC. Matrix Array", 
         answer:"A", penalty:35, reward:90, explanation:"Benar! Gerbong terhubung via sambungan/alamat penunjuk seperti Linked List." 
@@ -611,12 +709,12 @@ function updateAllPlayerPositions(){
 
         playersInTile.forEach((data,order)=>{
             let playerSize = 24;
-            let spacing = 5;
+            let spacing = 4;
             let cols = 2;
             let row = Math.floor(order / cols);
             let col = order % cols;
-            let offsetX = 10 + (col * (playerSize + spacing));
-            let offsetY = 10 + (row * (playerSize + spacing));
+            let offsetX = 12 + (col * (playerSize + spacing));
+            let offsetY = 12 + (row * (playerSize + spacing));
 
             data.player.element.style.left = (tile.x + offsetX) + "px";
             data.player.element.style.top = (tile.y + offsetY) + "px";
@@ -632,26 +730,31 @@ function updateUI(){
         document.getElementById("p4box")
     ];
 
-    boxes.forEach(box=>box.innerHTML="");
+    boxes.forEach(box => {
+        box.innerHTML = "";
+        box.style.display = "none"; 
+    });
 
     players.forEach((player,index)=>{
+        boxes[index].style.display = "flex"; 
         let propsHTML = "";
         if(player.properties.length > 0) {
             propsHTML = "<ol class='property-list'>";
             player.properties.forEach(p => { propsHTML += `<li>${p}</li>`; });
             propsHTML += "</ol>";
         } else {
-            propsHTML = "<br><span style='font-size:11px; color:#aaa; padding-left:15px;'>Belum ada properti</span>";
+            propsHTML = "<span style='font-size:10px; color:#aaa;'>Belum ada properti</span>";
         }
 
-        let statusJail = player.jailTurns > 0 ? ` <span style="color:red;">(🔒 Jailed)</span>` : "";
+        let statusJail = player.jailTurns > 0 ? ` <span style="color:#ee5253; font-size:11px;">🔒 Jailed</span>` : "";
 
         boxes[index].innerHTML = `
-            <h3 style="color:${colors[index]}; margin: 5px 0;">${player.name}${statusJail}</h3>
-            💰 Money: ${player.money}<br>
-            🏠 Jumlah Properti: ${player.properties.length}
-            <div style="font-weight:bold; margin-top:5px; font-size:12px;">Daftar Properti:</div>
-            ${propsHTML}
+            <h3 style="color:${colors[index]};">${player.name}${statusJail}</h3>
+            <div>💰 Saldo: <b>${player.money}</b></div>
+            <div class="property-container">
+                <div style="font-weight:bold; font-size:11px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:2px;">Aset Properti:</div>
+                ${propsHTML}
+            </div>
         `;
     });
 
@@ -663,12 +766,12 @@ function updateUI(){
         turnQueue.forEach(index=>{
             queueText += `<span style="color:${colors[index]}">[${players[index].name}]</span> ➜ `;
         });
-        queueDisplay.innerHTML = queueText;
+        queueDisplay.innerHTML = queueText.slice(0, -3);
     }
 }
 
 function addLog(text){
-    logBox.innerHTML += text + "<br>";
+    logBox.innerHTML += "⚡ " + text + "<br>";
     logBox.scrollTop = logBox.scrollHeight;
 }
 
@@ -698,10 +801,12 @@ function rollDice(){
     let rollInterval = setInterval(() => {
         let randomFace = Math.floor(Math.random() * 6) + 1;
         diceVisual.innerHTML = diceFaces[randomFace];
+        diceVisual.style.transform = `scale(${1 + (Math.random() * 0.2)}) rotate(${Math.random() * 20 - 10}deg)`;
         counter++;
         
         if(counter > 6) {
             clearInterval(rollInterval);
+            diceVisual.style.transform = "none";
             
             let dice = Math.floor(Math.random()*6)+1;
             diceVisual.innerHTML = diceFaces[dice] + " (" + dice + ")";
@@ -754,16 +859,15 @@ function processTile(playerIndex){
     }
 
     if(players[playerIndex].position === FREE_PARKING_INDEX) {
+        sfxFaucet.currentTime = 0;
+        sfxFaucet.play().catch(e => console.log(e));
+
         if(freeParkingPool > 0) {
-            sfxCorrect.currentTime = 0;
-            sfxCorrect.play();
             alert(`🎁 CRYPTO FAUCET! ${players[playerIndex].name} mendapatkan bonus koin terkumpul gratis sebesar 💰${freeParkingPool}!`);
             players[playerIndex].money += freeParkingPool;
             addLog(`🎁 ${players[playerIndex].name} menguras Crypto Faucet sebesar +${freeParkingPool}`);
             freeParkingPool = 0;
         } else {
-            sfxCorrect.currentTime = 0;
-            sfxCorrect.play();
             alert(`🟢 Anda singgah di Crypto Faucet, sayangnya tangki koin sedang kosong.`);
             addLog(`🟢 ${players[playerIndex].name} singgah di Crypto Faucet.`);
         }
@@ -779,8 +883,8 @@ function processTile(playerIndex){
                     players[playerIndex].properties.push(tile.name);
                     addLog("🏠 " + players[playerIndex].name + " membeli " + tile.name);
                     
-                    sfxCorrect.currentTime = 0;
-                    sfxCorrect.play().catch(e=>console.log(e));
+                    sfxBuy.currentTime = 0;
+                    sfxBuy.play().catch(e => console.log(e));
                 } else {
                     sfxWrong.currentTime = 0;
                     sfxWrong.play();
@@ -817,13 +921,8 @@ function processTile(playerIndex){
 function processChance(playerIndex){
     let card = chanceCards[Math.floor(Math.random()*chanceCards.length)];
     
-    if(card.includes("-70") || card.includes("Bayar denda 50")) {
-        sfxWrong.currentTime = 0;
-        sfxWrong.play().catch(e=>console.log(e));
-    } else {
-        sfxCorrect.currentTime = 0;
-        sfxCorrect.play().catch(e=>console.log(e));
-    }
+    sfxCard.currentTime = 0;
+    sfxCard.play().catch(e => console.log(e));
 
     alert("🎴 KESEMPATAN\n\n" + card);
     addLog("🎴 " + card);
@@ -843,13 +942,8 @@ function processChance(playerIndex){
 function processCommunity(playerIndex){
     let card = communityCards[Math.floor(Math.random()*communityCards.length)];
     
-    if(card.includes("-60") || card.includes("-50")) {
-        sfxWrong.currentTime = 0;
-        sfxWrong.play().catch(e=>console.log(e));
-    } else {
-        sfxCorrect.currentTime = 0;
-        sfxCorrect.play().catch(e=>console.log(e));
-    }
+    sfxCard.currentTime = 0;
+    sfxCard.play().catch(e => console.log(e));
 
     alert("📦 DANA UMUM\n\n" + card);
     addLog("📦 " + card);
@@ -911,16 +1005,18 @@ function checkWinner(){
 
     for (let player of players) {
         if(player.money >= targetMoney){
-            sfxCorrect.currentTime = 0;
-            sfxCorrect.play().catch(e=>console.log(e));
+            sfxWin.currentTime = 0;
+            sfxWin.play().catch(e => console.log(e));
+
             alert(`🎉 SELAMAT! ${player.name} adalah WINNER 🏆 karena berhasil mengumpulkan uang sebanyak 💰${player.money} (Target: ${targetMoney})!`);
             addLog(`🏆 ${player.name} MENANG PERMAINAN!`);
             gameOver = true;
             break;
         }
         if(player.money <= 0){
-            sfxWrong.currentTime = 0;
-            sfxWrong.play().catch(e=>console.log(e));
+            sfxLose.currentTime = 0;
+            sfxLose.play().catch(e => console.log(e));
+
             alert(`😭 ANDA BANGKRUT! ${player.name} mendapatkan gelar KEKALAHAN karena kehabisan modal bisnis.`);
             addLog(`💀 ${player.name} BANGKRUT! Game Selesai.`);
             gameOver = true;
@@ -939,30 +1035,28 @@ function checkWinner(){
 }
 
 /* ==========================================================================
-   5. AUTO-ZOOM MONITOR SCALING ENGINE
+   4. DYNAMIC RESPONSIVE AUTO-SCALE ENGINE
    ========================================================================== */
-function handleResponsiveScale() {
-    const container = document.querySelector('.game-container');
-    if (!container) return;
-    
-    // Dimensi default basis pengerjaan (lebar total sidebar + board + gap)
-    const baseWidth = 1400;
-    const baseHeight = 940;
-    
-    // Kalkulasi rasio viewport pengguna saat ini
-    const scaleX = window.innerWidth / baseWidth;
-    const scaleY = window.innerHeight / baseHeight;
-    
-    // Ambil nilai terkecil agar fit sempurna tanpa meluap/scroll
-    const finalScale = Math.min(scaleX, scaleY, 1);
-    
-    container.style.transform = `scale(${finalScale})`;
+function initResponsiveBoard() {
+    const resizeBoard = () => {
+        const container = document.getElementById("boardContainer");
+        const boardEl = document.getElementById("board");
+        if (!container || !boardEl) return;
+        
+        // Menghitung rasio skala terbaik berdasarkan lebar dan tinggi kontainer saat ini
+        const scale = Math.min(container.clientWidth / 900, container.clientHeight / 900);
+        
+        // Terapkan transformasi skala secara presisi agar papan pas penuh di layar (diberi margin aman 4%)
+        boardEl.style.transform = `scale(${scale * 0.96})`;
+    };
+
+    window.addEventListener("resize", resizeBoard);
+    resizeBoard();
+    setTimeout(resizeBoard, 200); // Fail-safe panggilan ulang setelah rendering awal selesai
 }
 
-// Pasang listener resize otomatis
-window.addEventListener('resize', handleResponsiveScale);
-window.addEventListener('DOMContentLoaded', handleResponsiveScale);
-setTimeout(handleResponsiveScale, 150);
+// Inisialisasi engine skala otomatis saat window dimuat
+window.addEventListener("DOMContentLoaded", initResponsiveBoard);
 </script>
 
 </body>
