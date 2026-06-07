@@ -1,0 +1,34 @@
+<body>
+  
+  <audio id="sfx-dice" src="assets/sound effect/efek-roll-dice.mp3"></audio>
+  <audio id="sfx-step" src="assets/sound effect/efek-melangkah.mp3"></audio>
+
+  <div class="game-wrapper">
+    <div class="board" id="board"></div>
+    <div id="players-container"></div>
+    <button class="btn-mulai" id="btn-mulai">MULAI</button>
+
+    <div class="side-panel hidden" id="side-panel">
+      <div class="turn-indicator">Giliran:<br><span id="current-player" style="color: #fdd749; font-size: 24px;">Player 1</span></div>
+      <img id="dice-img" src="assets/dadu/dadu-1.png" alt="Dadu">
+      <button id="btn-roll">ROLL DICE</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="popup-petarung">
+      <div class="popup-box">
+        <h2>Jumlah petarung</h2>
+        <div class="popup-controls">
+          <select id="dropdown-petarung" class="dropdown-abu">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+          <button id="btn-gas" class="btn-abu">Gas</button>
+        </div>
+      </div>
+  </div>
+
+  <script src="ulartangga.js"></script>
+</body>

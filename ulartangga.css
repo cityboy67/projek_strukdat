@@ -1,0 +1,289 @@
+/* Menghapus jarak bawaan browser pada semua elemen */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Mengatur tampilan layar utama agar elemen berada di tengah */
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #222;
+  font-family: 'Arial Black', Arial, sans-serif; 
+}
+
+/* Mengatur ukuran dan tata letak grid untuk papan ular tangga */
+.board {
+  width: 90vmin;
+  height: 90vmin;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  border: 4px solid black;
+  background-color: black; 
+  gap: 3px; 
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Mengatur ruang di dalam masing-masing kotak grid */
+.cell {
+  position: relative;
+  padding: 5px;
+}
+
+
+/* Mengatur posisi dan ukuran angka secara responsif */
+.number {
+  position: absolute;
+  top: 8%; 
+  left: 10%;
+  font-size: 2.2vmin; 
+  font-weight: 200;
+  color: white; 
+}
+
+/* Mengatur posisi dan gaya tulisan 'MULAI' secara responsif */
+.mulai-text {
+  position: absolute;
+  top: 45%; 
+  left: 10%;
+  font-size: 1.8vmin;
+  font-weight: 500;
+  color: white;
+}
+
+/* Mengatur posisi dan gaya tulisan 'FINISH' secara responsif */
+.finish-text {
+  position: absolute;
+  top: 45%; 
+  left: 10%;
+  font-size: 1.8vmin;
+  font-weight: 500;
+  color: white;
+  text-shadow: 1px 1px 3px black; 
+}
+
+
+/* Mengatur warna latar belakang pelangi dan memanggil animasinya */
+.rainbow {
+  /* Membuat gradasi warna pelangi */
+  background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  /* Memperbesar ukuran background agar bisa digeser-geser oleh animasi */
+  background-size: 400% 400%;
+  /* Menjalankan animasi bernama 'rainbowAnim' selama 5 detik, berulang tanpa henti (infinite) */
+  animation: rainbowAnim 5s ease infinite;
+}
+
+/* Membuat urutan pergerakan animasi (menggeser posisi background) */
+@keyframes rainbowAnim {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Pengaturan untuk gambar Ular dan Tangga */
+.obstacle-img {
+  position: absolute;
+  /* Pointer-events none agar gambar tidak menghalangi jika nanti kita ingin membuat kotak bisa diklik */
+  pointer-events: none; 
+  z-index: 10; /* Memastikan gambar berada di atas kotak angka */
+  object-fit: contain;
+}
+
+/* Mengatur posisi dan gaya tulisan 'MATERI' di bagian bawah kotak */
+.materi-text {
+  position: absolute;
+  bottom: 8%; /* Menempel di area bawah kotak */
+  left: 10%;
+  font-size: 1.5vmin; /* Ukuran font lebih kecil agar rapi */
+  font-weight: 500;
+  color: white;
+  text-shadow: 1px 1px 2px black; /* Bayangan agar teks terbaca jelas */
+}
+
+/* --- WADAH GAME & TOMBOL MULAI --- */
+.game-wrapper {
+  position: relative; 
+  /* Kunci ukuran wadah ini agar sama persis dengan ukuran papan */
+  width: 90vmin;
+  height: 90vmin;
+}
+
+.btn-mulai {
+  position: absolute;
+  bottom: 0; 
+  right: -160px; 
+  padding: 15px 25px;
+  background-color: #4B75FE;
+  color: white;
+  border: 4px solid black;
+  border-radius: 10px;
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 100;
+}
+
+.btn-mulai:hover {
+  transform: scale(1.05);
+  background: #0008ff;
+}
+
+/* --- OVERLAY & POPUP PETARUNG --- */
+.overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.popup-box {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.popup-box h2 {
+  font-size: 28px;
+  color: black;
+  margin-bottom: 20px;
+}
+
+.popup-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.dropdown-abu {
+  width: 250px;
+  height: 45px;
+  background: #a9a9a9; 
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  color: black;
+  cursor: pointer;
+  appearance: none; 
+  -webkit-appearance: none;
+  text-align: center; 
+}
+
+.dropdown-abu:hover {
+  background: #999;
+}
+
+.btn-abu {
+  background: #a9a9a9;
+  border: none;
+  width: 80px;
+  height: 45px;
+  border-radius: 10px;
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  color: black;
+  cursor: pointer;
+}
+
+.btn-abu:hover {
+  background: #888;
+}
+
+/* --- LAPISAN & ANIMASI BIDAK PEMAIN --- */
+#players-container {
+  position: absolute;
+  top: 0; left: 0; 
+  width: 100%; height: 100%;
+  pointer-events: none; 
+  z-index: 50; 
+}
+
+.player-pawn {
+  position: absolute;
+  transition: all 1s ease-in-out; 
+  filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6)); 
+  z-index: 60;
+}
+
+/* --- KOTAK DADU (SIDE PANEL) --- */
+.side-panel {
+  position: absolute;
+  top: 15%; 
+  right: -200px; /* Melayang murni di luar papan sebelah kanan */
+  
+  width: 160px;
+  background: #8A2BE2; /* Warna ungu */
+  border-radius: 15px;
+  border: 4px solid #fff;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  z-index: 100;
+}
+
+.turn-indicator {
+  color: white;
+  font-size: 16px;
+  font-weight: 900;
+  text-align: center;
+}
+
+#dice-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+}
+
+#btn-roll {
+  background: #fdd749;
+  color: black;
+  border: 3px solid black;
+  font-weight: 900;
+  font-size: 18px;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.2s;
+}
+
+#btn-roll:hover {
+  transform: scale(1.05);
+  background: #ffea8c;
+}
+
+#btn-roll:disabled {
+  background: #999;
+  color: #555;
+  cursor: not-allowed;
+  transform: none;
+}
