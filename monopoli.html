@@ -13,23 +13,25 @@ body {
     background: radial-gradient(circle, #1e272e 0%, #0f141c 100%);
     color: #ffffff;
     font-family: 'Segoe UI', Arial, sans-serif;
+    overflow-x: hidden; /* Mencegah scroll horizontal */
 }
 
 h1 {
     text-align: center;
-    margin-top: 15px;
+    margin: 10px 0 5px 0;
     color: #00d2d3;
     text-shadow: 0 0 10px rgba(0, 210, 211, 0.5);
+    font-size: 24px;
 }
 
 .top-control {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 input {
-    padding: 10px;
-    width: 150px;
+    padding: 8px;
+    width: 120px;
     border: 2px solid #34495e;
     background: #2c3e50;
     color: white;
@@ -38,51 +40,65 @@ input {
 }
 
 button {
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
     background: #10ac84;
     color: white;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    box-shadow: 0 4px 0 #0b8463;
+    box-shadow: 0 3px 0 #0b8463;
     transition: all 0.1s ease;
 }
 
 button:hover { background: #1dd1a1; }
-button:active { transform: translateY(4px); box-shadow: none; }
+button:active { transform: translateY(3px); box-shadow: none; }
 button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
 
 .turn-box {
     text-align: center;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     color: #ff9f43;
 }
 
 .queue-box {
     text-align: center;
-    margin-bottom: 15px;
-    font-size: 18px;
+    margin-bottom: 10px;
+    font-size: 14px;
 }
 
+/* CONTAINER UTAMA: Memastikan semua elemen berjajar rapi dalam satu layar tanpa scroll */
 .game-container {
     display: flex;
     justify-content: center;
-    position: relative;
+    align-items: center;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 10px;
 }
 
-/* BOARD UPGRADE: Efek neon border glowing */
+.side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 220px;
+}
+
+/* BOARD UPGRADE: Diperkecil ke 650px agar pas masuk resolusi layar standar tanpa scroll vertikal */
 .board {
-    width: 900px;
-    height: 900px;
+    width: 650px;
+    height: 650px;
     background: #222f3e;
     border: 5px solid #00d2d3;
     position: relative;
     box-shadow: 0 0 30px rgba(0, 210, 211, 0.3);
+    flex-shrink: 0;
 }
 
+/* TILE TEXT OPTIMIZATION: Diperbesar ukurannya dan dipaksa membungkus kata dengan rapi */
 .tile {
     position: absolute;
     border: 1px solid #10ac84;
@@ -91,22 +107,27 @@ button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
     justify-content: center;
     align-items: center;
     text-align: center;
-    font-size: 11px;
+    font-size: 12px; /* Ukuran tulisan diperbesar agar lebih terbaca jelas */
     font-weight: bold;
-    padding: 5px;
+    padding: 4px;
     color: #ffffff;
+    word-wrap: break-word;
+    overflow: hidden;
+    line-height: 1.2;
 }
 
+/* Dimensi Grid Baru yang Proporsional dengan Papan 650px */
 .corner {
-    width: 140px;
-    height: 140px;
+    width: 106px;
+    height: 106px;
     background: #341f97;
     color: #ffffff;
     border: 1px solid #5f27cd;
+    font-size: 13px;
 }
 
-.horizontal { width: 88px; height: 140px; }
-.vertical { width: 140px; height: 88px; }
+.horizontal { width: 63px; height: 106px; }
+.vertical { width: 106px; height: 63px; }
 
 .property { background: #2e86de; }
 .chance { background: #833471; }
@@ -116,10 +137,10 @@ button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
 
 .center-area {
     position: absolute;
-    width: 532px;
-    height: 532px;
-    left: 184px;
-    top: 184px;
+    width: 428px;
+    height: 428px;
+    left: 106px;
+    top: 106px;
     background: #1e272e;
     border: 5px dashed #00d2d3;
     display: flex;
@@ -128,14 +149,14 @@ button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
     flex-direction: column;
 }
 
-.center-area h1 { font-size: 55px; margin: 0; color: #00d2d3; }
-.center-area p { font-size: 20px; color: #84817a; margin: 5px 0; }
+.center-area h1 { font-size: 38px; margin: 0; color: #00d2d3; }
+.center-area p { font-size: 15px; color: #84817a; margin: 3px 0; }
 
 .dice-visual {
-    font-size: 45px;
-    margin-top: 15px;
+    font-size: 32px;
+    margin-top: 10px;
     background: #2c3e50;
-    padding: 10px 20px;
+    padding: 5px 15px;
     border: 3px solid #00d2d3;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
@@ -143,8 +164,8 @@ button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
 }
 
 .player {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     position: absolute;
     z-index: 999;
@@ -153,45 +174,41 @@ button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     border: 2px solid white;
-    box-shadow: 0 0 8px rgba(255,255,255,0.8);
+    box-shadow: 0 0 6px rgba(255,255,255,0.8);
 }
 
+/* UI BOX PLAYER LENGKAP: Tata letak rapi di sisi kanan & kiri board */
 .player-info {
-    position: absolute;
-    width: 180px;
     background: #2c3e50;
     border: 2px solid #34495e;
     border-radius: 10px;
     padding: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    font-size: 14px;
-    max-height: 250px;
+    font-size: 13px;
+    height: 180px;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
-#p1box{ left:10px; top:140px; }
-#p2box{ right:10px; top:140px; }
-#p3box{ left:10px; bottom:20px; }
-#p4box{ right:10px; bottom:20px; }
-
 .log {
-    width: 600px;
-    margin: 20px auto;
+    width: 650px;
+    margin: 10px auto;
     background: #2c3e50;
     border: 1px solid #34495e;
     border-radius: 10px;
-    padding: 15px;
-    height: 180px;
+    padding: 10px;
+    height: 90px;
     overflow: auto;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     color: #c8d6e5;
+    font-size: 13px;
 }
 
-.property-list { margin-top: 5px; padding-left: 15px; font-size: 11px; color: #ffdd59; }
-.audio-control { margin-top: 10px; font-size: 13px; color: #ff9f43; cursor: pointer; text-decoration: underline; font-weight: bold; }
+.property-list { margin-top: 3px; padding-left: 15px; font-size: 11px; color: #ffdd59; }
+.audio-control { margin-top: 8px; font-size: 12px; color: #ff9f43; cursor: pointer; text-decoration: underline; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -208,19 +225,24 @@ button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
 <div class="queue-box" id="queueDisplay"></div>
 
 <div class="game-container">
-    <div id="p1box" class="player-info"></div>
-    <div id="p2box" class="player-info"></div>
-    <div id="p3box" class="player-info"></div>
-    <div id="p4box" class="player-info"></div>
+    <div class="side-column">
+        <div id="p1box" class="player-info"></div>
+        <div id="p3box" class="player-info"></div>
+    </div>
 
     <div class="board" id="board">
         <div class="center-area">
             <h1>TECHOPOLY</h1>
             <p>Monopoly Struktur Data</p>
-            <p id="poolDisplay" style="font-size: 16px; margin-top: 10px; color: #ffff2e; font-weight: bold;">Crypto Faucet Pool: 💰0</p>
+            <p id="poolDisplay" style="font-size: 14px; margin-top: 5px; color: #ffff2e; font-weight: bold;">Crypto Faucet Pool: 💰0</p>
             <div id="diceVisual" class="dice-visual">🎲</div>
             <div class="audio-control" onclick="toggleBGM()">🎵 Aktifkan/Mute Backsound</div>
         </div>
+    </div>
+
+    <div class="side-column">
+        <div id="p2box" class="player-info"></div>
+        <div id="p4box" class="player-info"></div>
     </div>
 </div>
 
@@ -229,14 +251,14 @@ button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
 <audio id="bgm" loop src="https://glichet.github.io/hosting-assets/synth_bgm_8bit.mp3" preload="auto"></audio>
 <audio id="sfxDice" src="assets/sound effect/efek-roll-dice.mp3" preload="auto"></audio>
 <audio id="sfxStep" src="assets/sound effect/efek-melangkah.mp3" preload="auto"></audio>
-<audio id="sfxCorrect" src="assets/sound effect/family-feud-good-answer.mp3" preload="auto"></audio>
-<audio id="sfxWrong" src="assets/sound effect/nope-construction-worker-tf2-gaming-sound-effect-hd_ai7HT0p.mp3" preload="auto"></audio>
+<audio id="sfxCorrect" src="https://glichet.github.io/hosting-assets/correct_chime.mp3" preload="auto"></audio>
+<audio id="sfxWrong" src="https://glichet.github.io/hosting-assets/wrong_buzz.mp3" preload="auto"></audio>
 
-<audio id="sfxFaucet" src="assets/sound effect/achievements2.mp3" preload="auto"></audio>
-<audio id="sfxBuy" src="assets/sound effect/getmoney.mp3" preload="auto"></audio>
-<audio id="sfxCard" src="assets/sound effect/achievements.mp3" preload="auto"></audio>
-<audio id="sfxWin" src="assets/sound effect/windah-absolute-cinema.mp3" preload="auto"></audio>
-<audio id="sfxLose" src="assets/sound effect/kucing-ketawa.mp3" preload="auto"></audio>
+<audio id="sfxFaucet" src="assets/sound effect/crypto-faucet.mp3" preload="auto"></audio>
+<audio id="sfxBuy" src="assets/sound effect/beli-properti.mp3" preload="auto"></audio>
+<audio id="sfxCard" src="assets/sound effect/dana-kesempatan.mp3" preload="auto"></audio>
+<audio id="sfxWin" src="assets/sound effect/player-menang.mp3" preload="auto"></audio>
+<audio id="sfxLose" src="assets/sound effect/player-kalah.mp3" preload="auto"></audio>
 
 <script>
 const board = document.getElementById("board");
@@ -310,17 +332,18 @@ function createTiles(){
         "Go To Jail", "Data Mining Lab", "Dana Umum", "Security Server", "Safe Zone", "Kesempatan", "Algorithm Center", "Internet Tower"
     ];
 
+    // Rekalkulasi koordinat path agar presisi pas dengan ukuran papan baru 650px
     let path = [];
-    path.push({x:760,y:760,w:140,h:140});
-    for(let i=0;i<7;i++) { path.push({x:672-(i*88), y:760, w:88, h:140}); }
-    path.push({x:0,y:760,w:140,h:140});
-    for(let i=0;i<7;i++) { path.push({x:0, y:672-(i*88), w:140, h:88}); }
-    path.push({x:0,y:0,w:140,h:140});
-    for(let i=0;i<7;i++) { path.push({x:140+(i*88), y:0, w:88, h:140}); }
-    path.push({x:760,y:0,w:140,h:140});
-    for(let i=0;i<7;i++) { path.push({x:760, y:140+(i*88), w:140, h:88}); }
+    path.push({x:544, y:544, w:106, h:106}); 
+    for(let i=0; i<7; i++) { path.push({x:481-(i*63), y:544, w:63, h:106}); } 
+    path.push({x:0, y:544, w:106, h:106}); 
+    for(let i=0; i<7; i++) { path.push({x:0, y:481-(i*63), w:106, h:63}); } 
+    path.push({x:0, y:0, w:106, h:106}); 
+    for(let i=0; i<7; i++) { path.push({x:106+(i*63), y:0, w:63, h:106}); } 
+    path.push({x:544, y:0, w:106, h:106}); 
+    for(let i=0; i<7; i++) { path.push({x:544, y:106+(i*63), w:106, h:63}); } 
 
-    for(let i=0;i<32;i++){
+    for(let i=0; i<32; i++){
         let type = "property";
         if(names[i].includes("Dana")) type = "community";
         if(names[i].includes("Kesempatan")) type = "chance";
@@ -347,8 +370,8 @@ function createBoard(){
     tiles.forEach(tile=>{
         let div = document.createElement("div");
         div.classList.add("tile");
-        if(tile.w === 140 && tile.h === 140) { div.classList.add("corner"); }
-        else if(tile.h === 140) { div.classList.add("horizontal"); }
+        if(tile.w === 106 && tile.h === 106) { div.classList.add("corner"); }
+        else if(tile.h === 106) { div.classList.add("horizontal"); }
         else { div.classList.add("vertical"); }
 
         if(tile.type === "property") div.classList.add("property");
@@ -365,7 +388,7 @@ function createBoard(){
 }
 createBoard();
 
-/* 2. BANK SOAL: 20 Soal Pilihan Ganda (A, B, C) Masing-Masing Materi Ada 5 Soal */
+/* BANK SOAL: 20 Soal Pilihan Ganda (A, B, C) Masing-Masing Materi Ada 5 Soal */
 const storyChallenges = [
     // --- QUEUE / FIFO (5 Soal) ---
     { 
@@ -526,13 +549,13 @@ function updateAllPlayerPositions(){
         });
 
         playersInTile.forEach((data,order)=>{
-            let playerSize = 24;
-            let spacing = 5;
+            let playerSize = 20;
+            let spacing = 3;
             let cols = 2;
             let row = Math.floor(order / cols);
             let col = order % cols;
-            let offsetX = 10 + (col * (playerSize + spacing));
-            let offsetY = 10 + (row * (playerSize + spacing));
+            let offsetX = 8 + (col * (playerSize + spacing));
+            let offsetY = 8 + (row * (playerSize + spacing));
 
             data.player.element.style.left = (tile.x + offsetX) + "px";
             data.player.element.style.top = (tile.y + offsetY) + "px";
@@ -563,10 +586,10 @@ function updateUI(){
         let statusJail = player.jailTurns > 0 ? ` <span style="color:red;">(🔒 Jailed)</span>` : "";
 
         boxes[index].innerHTML = `
-            <h3 style="color:${colors[index]}; margin: 5px 0;">${player.name}${statusJail}</h3>
+            <h3 style="color:${colors[index]}; margin: 2px 0;">${player.name}${statusJail}</h3>
             💰 Money: ${player.money}<br>
             🏠 Jumlah Properti: ${player.properties.length}
-            <div style="font-weight:bold; margin-top:5px; font-size:12px;">Daftar Properti:</div>
+            <div style="font-weight:bold; margin-top:3px; font-size:11px;">Daftar Properti:</div>
             ${propsHTML}
         `;
     });
@@ -669,7 +692,6 @@ function processTile(playerIndex){
         return;
     }
 
-    // --- SLOT KONDISI 1: Mendarat di Crypto Faucet ---
     if(players[playerIndex].position === FREE_PARKING_INDEX) {
         sfxFaucet.currentTime = 0;
         sfxFaucet.play().catch(e => console.log(e));
@@ -695,7 +717,6 @@ function processTile(playerIndex){
                     players[playerIndex].properties.push(tile.name);
                     addLog("🏠 " + players[playerIndex].name + " membeli " + tile.name);
                     
-                    // --- SLOT KONDISI 2: Membeli Properti ---
                     sfxBuy.currentTime = 0;
                     sfxBuy.play().catch(e => console.log(e));
                 } else {
@@ -734,7 +755,6 @@ function processTile(playerIndex){
 function processChance(playerIndex){
     let card = chanceCards[Math.floor(Math.random()*chanceCards.length)];
     
-    // --- SLOT KONDISI 3A: Mendapatkan Kartu Kesempatan ---
     sfxCard.currentTime = 0;
     sfxCard.play().catch(e => console.log(e));
 
@@ -756,7 +776,6 @@ function processChance(playerIndex){
 function processCommunity(playerIndex){
     let card = communityCards[Math.floor(Math.random()*communityCards.length)];
     
-    // --- SLOT KONDISI 3B: Mendapatkan Kartu Dana Umum ---
     sfxCard.currentTime = 0;
     sfxCard.play().catch(e => console.log(e));
 
@@ -819,7 +838,6 @@ function checkWinner(){
     let gameOver = false;
 
     for (let player of players) {
-        // --- SLOT KONDISI 4: Player Menang ---
         if(player.money >= targetMoney){
             sfxWin.currentTime = 0;
             sfxWin.play().catch(e => console.log(e));
@@ -829,7 +847,6 @@ function checkWinner(){
             gameOver = true;
             break;
         }
-        // --- SLOT KONDISI 5: Player Bangkrut/Kalah ---
         if(player.money <= 0){
             sfxLose.currentTime = 0;
             sfxLose.play().catch(e => console.log(e));
