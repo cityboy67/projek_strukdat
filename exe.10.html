@@ -1,308 +1,266 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TECHOPOLY - Anti Collision Layout</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECHOPOLY - Monopoly Struktur Data</title>
 
-    <style>
-        /* ==========================================================================
-           1. CORE LAYOUT SYSTEM (STRICT GRID ANTI-TABRAKAN)
-           ========================================================================== */
-        body {
-            margin: 0;
-            padding: 10px;
-            background: radial-gradient(circle, #1e272e 0%, #0f141c 100%);
-            color: #ffffff;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            box-sizing: border-box;
-            height: 100vh;
-            overflow: hidden; /* Mengunci scrollbar utama browser */
-            
-            /* Pembagian 3 baris mutlak agar komponen tidak saling tindih */
-            display: grid;
-            grid-template-rows: auto 1fr auto; 
-            gap: 10px;
-        }
+<style>
+/* 1. BACKGROUND & ESTETIKA BARU: Tema Dark Tech / Cyberpunk Modern */
+body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle, #1e272e 0%, #0f141c 100%);
+    color: #ffffff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    overflow-x: hidden; /* Mencegah scroll horizontal */
+}
 
-        /* Pembungkus Komponen Kontrol Atas */
-        .game-header {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+h1 {
+    text-align: center;
+    margin: 10px 0 5px 0;
+    color: #00d2d3;
+    text-shadow: 0 0 10px rgba(0, 210, 211, 0.5);
+    font-size: 24px;
+}
 
-        h1.main-title {
-            margin: 0;
-            font-size: clamp(20px, 2.8vh, 30px);
-            color: #00d2d3;
-            text-shadow: 0 0 10px rgba(0, 210, 211, 0.5);
-        }
+.top-control {
+    text-align: center;
+    margin-bottom: 10px;
+}
 
-        .top-control {
-            margin: 2px 0;
-        }
+input {
+    padding: 8px;
+    width: 120px;
+    border: 2px solid #34495e;
+    background: #2c3e50;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+}
 
-        input {
-            padding: 6px;
-            width: 110px;
-            border: 2px solid #34495e;
-            background: #2c3e50;
-            color: white;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 13px;
-        }
+button {
+    padding: 8px 16px;
+    border: none;
+    background: #10ac84;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 3px 0 #0b8463;
+    transition: all 0.1s ease;
+}
 
-        button {
-            padding: 6px 16px;
-            border: none;
-            background: #10ac84;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
-            box-shadow: 0 3px 0 #0b8463;
-        }
+button:hover { background: #1dd1a1; }
+button:active { transform: translateY(3px); box-shadow: none; }
+button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
 
-        button:hover { background: #1dd1a1; }
-        button:active { transform: translateY(3px); box-shadow: none; }
-        button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
+.turn-box {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #ff9f43;
+}
 
-        .turn-box {
-            font-size: clamp(14px, 2vh, 20px);
-            font-weight: bold;
-            color: #ff9f43;
-        }
+.queue-box {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
 
-        .queue-box {
-            font-size: clamp(11px, 1.6vh, 16px);
-        }
+/* CONTAINER UTAMA: Memastikan semua elemen berjajar rapi dalam satu layar tanpa scroll */
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
 
-        /* ==========================================================================
-           2. MIDDLE ARENA: GRID AREA UTAMA PERMAINAN
-           ========================================================================== */
-        .game-container {
-            display: grid;
-            grid-template-columns: 260px 1fr 260px; /* Lebar UI Box Player Kiri & Kanan */
-            gap: 15px;
-            align-items: center;
-            justify-content: center;
-            min-height: 0; /* Mencegah elemen meluber keluar grid */
-            height: 100%;
-        }
+.side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 220px;
+}
 
-        .sidebar-left, .sidebar-right {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 60vh; /* Disamakan dengan tinggi maksimal papan */
-        }
+/* BOARD UPGRADE: Diperkecil ke 650px agar pas masuk resolusi layar standar tanpa scroll vertikal */
+.board {
+    width: 650px;
+    height: 650px;
+    background: #222f3e;
+    border: 5px solid #00d2d3;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 210, 211, 0.3);
+    flex-shrink: 0;
+}
 
-        /* ==========================================================================
-           3. SIDEBAR PLAYER BOX UI
-           ========================================================================== */
-        .player-info {
-            background: #2c3e50;
-            border: 3px solid #34495e;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-            font-size: clamp(12px, 1.6vh, 17px); 
-            height: 48%; /* Membagi ruang atas bawah seimbang di sidebar */
-            overflow-y: auto;
-            box-sizing: border-box;
-            line-height: 1.35;
-        }
+/* TILE TEXT OPTIMIZATION: Diperbesar ukurannya dan dipaksa membungkus kata dengan rapi */
+.tile {
+    position: absolute;
+    border: 1px solid #10ac84;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 12px; /* Ukuran tulisan diperbesar agar lebih terbaca jelas */
+    font-weight: bold;
+    padding: 4px;
+    color: #ffffff;
+    word-wrap: break-word;
+    overflow: hidden;
+    line-height: 1.2;
+}
 
-        .player-info h3 {
-            font-size: clamp(14px, 2.1vh, 22px);
-            margin: 0 0 6px 0;
-            border-bottom: 2px solid #485e74;
-            padding-bottom: 3px;
-        }
+/* Dimensi Grid Baru yang Proporsional dengan Papan 650px */
+.corner {
+    width: 106px;
+    height: 106px;
+    background: #341f97;
+    color: #ffffff;
+    border: 1px solid #5f27cd;
+    font-size: 13px;
+}
 
-        /* ==========================================================================
-           4. PAPAN MONOPOLI (RESPONSIF & AMAN DI ZOOM 100%)
-           ========================================================================== */
-        .board-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
+.horizontal { width: 63px; height: 106px; }
+.vertical { width: 106px; height: 63px; }
 
-        .board {
-            height: 62vh; /* Dioptimalkan dari 76vh ke 60vh agar pas di zoom 100% monitor manapun */
-            width: 78vh;  /* Tetap kotak sempurna 1:1 */
-            background: #222f3e;
-            border: 6px solid #00d2d3;
-            position: relative;
-            box-shadow: 0 0 35px rgba(0, 210, 211, 0.4);
-            box-sizing: border-box;
-        }
+.property { background: #2e86de; }
+.chance { background: #833471; }
+.community { background: #e15f41; }
+.safe { background: #576574; }
+.jail { background: #ee5253; }
 
-        /* Teks Tile Dinamis Otomatis Membesar saat Zoom Out */
-        .tile {
-            position: absolute;
-            border: 1px solid #10ac84;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-weight: 850; 
-            padding: 4px;
-            color: #ffffff;
-            font-size: clamp(8.5px, 1.07vh, 14px); 
-            line-height: 1.15;
-            word-break: break-word;
-            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-        }
+.center-area {
+    position: absolute;
+    width: 428px;
+    height: 428px;
+    left: 106px;
+    top: 106px;
+    background: #1e272e;
+    border: 5px dashed #00d2d3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 
-        .corner { 
-            width: 15.5%; 
-            height: 15.5%; 
-            background: #341f97; 
-            color: #ffffff; 
-            border: 2px solid #5f27cd; 
-            z-index: 10; 
-            font-size: clamp(13px, 1.7vh, 24px); 
-        }
-        
-        .horizontal { width: 9.85%; height: 15.5%; }
-        .vertical { width: 15.5%; height: 9.85%; }
+.center-area h1 { font-size: 38px; margin: 0; color: #00d2d3; }
+.center-area p { font-size: 15px; color: #84817a; margin: 3px 0; }
 
-        /* Tipe Warna Kamar Tile */
-        .property { background: #2e86de; border-top: 4px solid #2471ba; }
-        .chance { background: #833471; }
-        .community { background: #e15f41; }
-        .safe { background: #576574; }
-        .jail { background: #ee5253; }
+.dice-visual {
+    font-size: 32px;
+    margin-top: 10px;
+    background: #2c3e50;
+    padding: 5px 15px;
+    border: 3px solid #00d2d3;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    color: white;
+}
 
-        /* Area Dalam Tengah Papan */
-        .center-area {
-            position: absolute;
-            width: 69%;
-            height: 69%;
-            left: 15.5%;
-            top: 15.5%;
-            background: #1e272e;
-            border: 4px dashed #00d2d3;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            box-sizing: border-box;
-            padding: 10px;
-        }
+.player {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 999;
+    transition: all .3s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    border: 2px solid white;
+    box-shadow: 0 0 6px rgba(255,255,255,0.8);
+}
 
-        .center-area h1 { font-size: clamp(22px, 4vh, 45px); margin: 0; color: #00d2d3; text-shadow: 0 0 8px rgba(0,210,211,0.4); }
-        .center-area p { font-size: clamp(12px, 1.8vh, 18px); color: #84817a; margin: 3px 0; }
+/* UI BOX PLAYER LENGKAP: Tata letak rapi di sisi kanan & kiri board */
+.player-info {
+    background: #2c3e50;
+    border: 2px solid #34495e;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    font-size: 13px;
+    height: 180px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
 
-        .dice-visual {
-            font-size: clamp(26px, 4vh, 40px);
-            margin-top: 8px;
-            background: #2c3e50;
-            padding: 4px 18px;
-            border: 3px solid #00d2d3;
-            border-radius: 10px;
-            color: white;
-        }
+.log {
+    width: 650px;
+    margin: 10px auto;
+    background: #2c3e50;
+    border: 1px solid #34495e;
+    border-radius: 10px;
+    padding: 10px;
+    height: 90px;
+    overflow: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    color: #c8d6e5;
+    font-size: 13px;
+}
 
-        /* Token Pemain */
-        .player {
-            width: clamp(16px, 2vh, 24px);
-            height: clamp(16px, 2vh, 24px);
-            border-radius: 50%;
-            position: absolute;
-            z-index: 99;
-            transition: all .3s ease-out;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: clamp(9px, 1.2vh, 13px);
-            font-weight: bold;
-            border: 2px solid white;
-            box-shadow: 0 0 6px rgba(255,255,255,0.9);
-        }
-
-        /* ==========================================================================
-           5. LOG BOX (DIKUNCI DI BARIS TERBAWAH GRID - ANTI TABRAKAN)
-           ========================================================================== */
-        .log {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            background: #2c3e50;
-            border: 2px solid #34495e;
-            border-radius: 8px;
-            padding: 8px;
-            height: 75px; /* Tinggi permanen aman */
-            overflow-y: auto;
-            color: #c8d6e5;
-            font-size: 13px;
-            box-sizing: border-box;
-        }
-
-        .property-list { margin-top: 4px; padding-left: 15px; font-size: clamp(11px, 1.4vh, 14px); color: #ffdd59; }
-        .audio-control { margin-top: 4px; font-size: clamp(11px, 1.5vh, 15px); color: #ff9f43; cursor: pointer; text-decoration: underline; font-weight: bold; }
-    </style>
+.property-list { margin-top: 3px; padding-left: 15px; font-size: 11px; color: #ffdd59; }
+.audio-control { margin-top: 8px; font-size: 12px; color: #ff9f43; cursor: pointer; text-decoration: underline; font-weight: bold; }
+</style>
 </head>
 <body>
 
-    <header class="game-header">
-        <h1 class="main-title">🎲 TECHOPOLY MONOPOLY</h1>
-        
-        <div class="top-control">
-            <input type="number" id="playerCount" min="2" max="4" placeholder="2-4 Player">
-            <button id="btnStart" onclick="startGame()">Start Game</button>
-            <button id="btnRoll" onclick="rollDice()">🎲 Roll Dice</button>
-        </div>
-        
-        <div class="turn-box" id="turnInfo">Masukkan jumlah player</div>
-        <div class="queue-box" id="queueDisplay"></div>
-    </header>
+<h1>🎲 TECHOPOLY MONOPOLY</h1>
 
-    <div class="game-container">
-        <div class="sidebar-left">
-            <div id="p1box" class="player-info"></div>
-            <div id="p3box" class="player-info"></div>
-        </div>
+<div class="top-control">
+    <input type="number" id="playerCount" min="2" max="4" placeholder="2-4 Player">
+    <button id="btnStart" onclick="startGame()">Start Game</button>
+    <button id="btnRoll" onclick="rollDice()">🎲 Roll Dice</button>
+</div>
 
-        <div class="board-wrapper">
-            <div class="board" id="board">
-                <div class="center-area">
-                    <h1>TECHOPOLY</h1>
-                    <p>Monopoly Struktur Data</p>
-                    <p id="poolDisplay" style="color: #ffff2e; font-weight: bold; margin-top: 5px;">Crypto Faucet Pool: 💰0</p>
-                    <div id="diceVisual" class="dice-visual">🎲</div>
-                    <div class="audio-control" onclick="toggleBGM()">🎵 Aktifkan/Mute Backsound</div>
-                </div>
-            </div>
-        </div>
+<div class="turn-box" id="turnInfo">Masukkan jumlah player</div>
+<div class="queue-box" id="queueDisplay"></div>
 
-        <div class="sidebar-right">
-            <div id="p2box" class="player-info"></div>
-            <div id="p4box" class="player-info"></div>
+<div class="game-container">
+    <div class="side-column">
+        <div id="p1box" class="player-info"></div>
+        <div id="p3box" class="player-info"></div>
+    </div>
+
+    <div class="board" id="board">
+        <div class="center-area">
+            <h1>TECHOPOLY</h1>
+            <p>Monopoly Struktur Data</p>
+            <p id="poolDisplay" style="font-size: 14px; margin-top: 5px; color: #ffff2e; font-weight: bold;">Crypto Faucet Pool: 💰0</p>
+            <div id="diceVisual" class="dice-visual">🎲</div>
+            <div class="audio-control" onclick="toggleBGM()">🎵 Aktifkan/Mute Backsound</div>
         </div>
     </div>
 
-    <div class="log" id="log"></div>
+    <div class="side-column">
+        <div id="p2box" class="player-info"></div>
+        <div id="p4box" class="player-info"></div>
+    </div>
+</div>
 
-    <audio id="bgm" loop src="https://glichet.github.io/hosting-assets/synth_bgm_8bit.mp3" preload="auto"></audio>
-    <audio id="sfxDice" src="https://glichet.github.io/hosting-assets/dice_shake.mp3" preload="auto"></audio>
-    <audio id="sfxStep" src="https://glichet.github.io/hosting-assets/step_click.mp3" preload="auto"></audio>
-    <audio id="sfxCorrect" src="https://glichet.github.io/hosting-assets/correct_chime.mp3" preload="auto"></audio>
-    <audio id="sfxWrong" src="https://glichet.github.io/hosting-assets/wrong_buzz.mp3" preload="auto"></audio>
+<div class="log" id="log"></div>
+
+<audio id="bgm" loop src="https://glichet.github.io/hosting-assets/synth_bgm_8bit.mp3" preload="auto"></audio>
+<audio id="sfxDice" src="assets/sound effect/efek-roll-dice.mp3" preload="auto"></audio>
+<audio id="sfxStep" src="assets/sound effect/efek-melangkah.mp3" preload="auto"></audio>
+<audio id="sfxCorrect" src="https://glichet.github.io/hosting-assets/correct_chime.mp3" preload="auto"></audio>
+<audio id="sfxWrong" src="https://glichet.github.io/hosting-assets/wrong_buzz.mp3" preload="auto"></audio>
+
+<audio id="sfxFaucet" src="assets/sound effect/crypto-faucet.mp3" preload="auto"></audio>
+<audio id="sfxBuy" src="assets/sound effect/beli-properti.mp3" preload="auto"></audio>
+<audio id="sfxCard" src="assets/sound effect/dana-kesempatan.mp3" preload="auto"></audio>
+<audio id="sfxWin" src="assets/sound effect/player-menang.mp3" preload="auto"></audio>
+<audio id="sfxLose" src="assets/sound effect/player-kalah.mp3" preload="auto"></audio>
 
 <script>
-/* ==========================================================================
-   ENGINE UTAMA GAME & VARIABEL KONFIGURASI
-   ========================================================================== */
 const board = document.getElementById("board");
 const logBox = document.getElementById("log");
 const turnInfo = document.getElementById("turnInfo");
@@ -311,11 +269,19 @@ const poolDisplay = document.getElementById("poolDisplay");
 const diceVisual = document.getElementById("diceVisual");
 const btnRoll = document.getElementById("btnRoll");
 
+// Audio Selector Utama
 const bgm = document.getElementById("bgm");
 const sfxDice = document.getElementById("sfxDice");
 const sfxStep = document.getElementById("sfxStep");
 const sfxCorrect = document.getElementById("sfxCorrect");
 const sfxWrong = document.getElementById("sfxWrong");
+
+// Audio Selector Slot Baru Anda
+const sfxFaucet = document.getElementById("sfxFaucet");
+const sfxBuy = document.getElementById("sfxBuy");
+const sfxCard = document.getElementById("sfxCard");
+const sfxWin = document.getElementById("sfxWin");
+const sfxLose = document.getElementById("sfxLose");
 
 const colors = ["#ff4d4d", "#3498db", "#2ecc71", "#f1c40f"];
 const diceFaces = ["🎲", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
@@ -333,87 +299,67 @@ const CYBER_JAIL_INDEX = 8;
 const FREE_PARKING_INDEX = 16;
 const GO_TO_JAIL_INDEX = 24;
 
+// Atur Volume Suara
 bgm.volume = 0.2;
 sfxDice.volume = 0.6;
 sfxStep.volume = 0.5;
 sfxCorrect.volume = 0.6;
 sfxWrong.volume = 0.6;
 
+// Atur Volume Suara Slot Baru
+sfxFaucet.volume = 0.6;
+sfxBuy.volume = 0.6;
+sfxCard.volume = 0.6;
+sfxWin.volume = 0.7;
+sfxLose.volume = 0.7;
+
 function toggleBGM() {
     if (bgm.paused) {
-        bgm.play().catch(e => alert("Klik sembarang tempat pada halaman web terlebih dahulu!"));
+        bgm.play().catch(e => alert("Silakan klik sembarang area di web/board terlebih dahulu, baru nyalakan musiknya kembali!"));
         addLog("🎵 Backsound diaktifkan.");
     } else {
         bgm.pause();
-        addLog("🎵 Backsound dimatikan.");
+        addLog("🎵 Backsound dimatikan (Mute).");
     }
 }
 
-/* ==========================================================================
-   INITIALIZATION MAP TILES MAP MONOPOLI
-   ========================================================================== */
 function createTiles(){
     tiles.length = 0;
     const names = [
-        "START", "JKT Digital City", "Dana Umum", "BDG Startup Hub", "Safe Zone", "Kesempatan", "Tokyo Tech", "Cloud District",
-        "Cyber Jail", "AI Inov Lab", "Dana Umum", "SG Data Center", "Safe Zone", "Kesempatan", "Queue Bank", "Sort Factory",
-        "Crypto Faucet", "Stack House", "Dana Umum", "Prog Campus", "Safe Zone", "Kesempatan", "DB Central", "Bug Hunter",
-        "Go To Jail", "Mining Lab", "Dana Umum", "Sec Server", "Safe Zone", "Kesempatan", "Algo Center", "Net Tower"
+        "START", "Jakarta Digital City", "Dana Umum", "Bandung Startup Hub", "Safe Zone", "Kesempatan", "Tokyo Tech Center", "Cloud District",
+        "Cyber Jail", "AI Innovation Lab", "Dana Umum", "Singapore Data Center", "Safe Zone", "Kesempatan", "Queue Financial Bank", "Sorting Factory",
+        "Crypto Faucet", "Stack Warehouse", "Dana Umum", "Programming Campus", "Safe Zone", "Kesempatan", "Database Central", "Bug Hunter Zone",
+        "Go To Jail", "Data Mining Lab", "Dana Umum", "Security Server", "Safe Zone", "Kesempatan", "Algorithm Center", "Internet Tower"
     ];
 
+    // Rekalkulasi koordinat path agar presisi pas dengan ukuran papan baru 650px
     let path = [];
-    
-    // Sudut Kanan Bawah (START)
-    path.push({x:84.5, y:84.5, type:"corner"});
-    
-    // Baris Bawah (Kanan ke Kiri)
-    for(let i=0; i<7; i++) { 
-        path.push({x: 74.65 - (i*9.85), y:84.5, type:"horizontal"}); 
-    }
-    
-    // Sudut Kiri Bawah (Cyber Jail)
-    path.push({x:0, y:84.5, type:"corner"});
-    
-    // Baris Kiri (Bawah ke Atas)
-    for(let i=0; i<7; i++) { 
-        path.push({x:0, y: 74.65 - (i*9.85), type:"vertical"}); 
-    }
-    
-    // Sudut Kiri Atas (Crypto Faucet)
-    path.push({x:0, y:0, type:"corner"});
-    
-    // Baris Atas (Kiri ke Kanan)
-    for(let i=0; i<7; i++) { 
-        path.push({x: 15.5 + (i*9.85), y:0, type:"horizontal"}); 
-    }
-    
-    // Sudut Kanan Atas (Go To Jail)
-    path.push({x:84.5, y:0, type:"corner"});
-    
-    // Baris Kanan (Atas ke Bawah)
-    for(let i=0; i<7; i++) { 
-        path.push({x:84.5, y: 15.5 + (i*9.85), type:"vertical"}); 
-    }
+    path.push({x:544, y:544, w:106, h:106}); 
+    for(let i=0; i<7; i++) { path.push({x:481-(i*63), y:544, w:63, h:106}); } 
+    path.push({x:0, y:544, w:106, h:106}); 
+    for(let i=0; i<7; i++) { path.push({x:0, y:481-(i*63), w:106, h:63}); } 
+    path.push({x:0, y:0, w:106, h:106}); 
+    for(let i=0; i<7; i++) { path.push({x:106+(i*63), y:0, w:63, h:106}); } 
+    path.push({x:544, y:0, w:106, h:106}); 
+    for(let i=0; i<7; i++) { path.push({x:544, y:106+(i*63), w:106, h:63}); } 
 
     for(let i=0; i<32; i++){
         let type = "property";
-        if(names[i].includes("Dana")) { type = "community"; }
-        if(names[i].includes("Kesempatan")) { type = "chance"; }
-        if(names[i].includes("Safe")) { type = "safe"; }
-        if(names[i].includes("Jail")) { type = "jail"; }
-        if(names[i] === "START") { type = "start"; }
-        if(names[i] === "Crypto Faucet") { type = "safe"; }
-        if(names[i] === "Go To Jail") { type = "jail"; }
+        if(names[i].includes("Dana")) type = "community";
+        if(names[i].includes("Kesempatan")) type = "chance";
+        if(names[i].includes("Safe")) type = "safe";
+        if(names[i].includes("Jail")) type = "jail";
+        if(names[i] === "START") type = "start";
+        if(names[i] === "Crypto Faucet") type = "safe";
+        if(names[i] === "Go To Jail") type = "jail";
 
         tiles.push({
-            name: names[i],
-            type: type,
-            price: 100 + (i*5),
-            rent: 20 + (i*2),
-            owner: null,
-            x: path[i].x, 
-            y: path[i].y, 
-            pType: path[i].type
+            name:names[i],
+            type:type,
+            price:100 + (i*5),
+            rent:20 + (i*2),
+            owner:null,
+            x:path[i].x, y:path[i].y, w:path[i].w, h:path[i].h
         });
     }
 }
@@ -424,151 +370,148 @@ function createBoard(){
     tiles.forEach(tile=>{
         let div = document.createElement("div");
         div.classList.add("tile");
-        
-        if(tile.pType === "corner") { div.classList.add("corner"); }
-        else if(tile.pType === "horizontal") { div.classList.add("horizontal"); }
+        if(tile.w === 106 && tile.h === 106) { div.classList.add("corner"); }
+        else if(tile.h === 106) { div.classList.add("horizontal"); }
         else { div.classList.add("vertical"); }
 
-        if(tile.type === "property") { div.classList.add("property"); }
-        if(tile.type === "chance") { div.classList.add("chance"); }
-        if(tile.type === "community") { div.classList.add("community"); }
-        if(tile.type === "safe") { div.classList.add("safe"); }
-        if(tile.type === "jail") { div.classList.add("jail"); }
+        if(tile.type === "property") div.classList.add("property");
+        if(tile.type === "chance") div.classList.add("chance");
+        if(tile.type === "community") div.classList.add("community");
+        if(tile.type === "safe") div.classList.add("safe");
+        if(tile.type === "jail") div.classList.add("jail");
 
-        div.style.left = tile.x + "%";
-        div.style.top = tile.y + "%";
+        div.style.left = tile.x + "px";
+        div.style.top = tile.y + "px";
         div.innerHTML = tile.name;
         board.appendChild(div);
     });
 }
 createBoard();
 
-/* ==========================================================================
-   SOAL TANTANGAN PILIHAN GANDA (A, B, C)
-   ========================================================================== */
+/* BANK SOAL: 20 Soal Pilihan Ganda (A, B, C) Masing-Masing Materi Ada 5 Soal */
 const storyChallenges = [
-    // --- QUEUE / FIFO ---
+    // --- QUEUE / FIFO (5 Soal) ---
     { 
         question: "Di sebuah bank digital, pelanggan yang datang lebih dulu selalu dilayani terlebih dahulu agar sistem tetap adil. Sistem apakah ini?\n\nA. FIFO\nB. LIFO\nC. Random Access", 
-        answer:"A", penalty:30, reward:80, explanation:"FIFO (First In First Out)." 
+        answer:"A", penalty:30, reward:80, explanation:"Benar! Bank menggunakan konsep antrean FIFO (First In First Out)." 
     },
     { 
         question: "Struktur data linier yang menyisipkan data dari belakang (rear) dan menghapus dari depan (front) disebut...?\n\nA. Stack\nB. Queue\nC. Tree", 
-        answer:"B", penalty:30, reward:80, explanation:"Queue (Antrean)." 
+        answer:"B", penalty:30, reward:80, explanation:"Benar! Itu adalah mekanisme dari Queue (Antrean)." 
     },
     { 
         question: "Kondisi eror ketika mencoba memasukkan data baru ke dalam Queue yang kapasitasnya sudah penuh disebut...?\n\nA. Underflow\nB. Shadowing\nC. Overflow", 
-        answer:"C", penalty:25, reward:70, explanation:"Kondisi penuh disebut Overflow." 
+        answer:"C", penalty:25, reward:70, explanation:"Benar! Kondisi penuh pada struktur data disebut Overflow." 
     },
     { 
         question: "Operasi untuk mengeluarkan atau menghapus elemen pertama dari sebuah struktur data Queue dinamakan...?\n\nA. Enqueue\nB. Dequeue\nC. Pop", 
-        answer:"B", penalty:30, reward:85, explanation:"Dequeue untuk menghapus data Queue." 
+        answer:"B", penalty:30, reward:85, explanation:"Benar! Enqueue untuk menambah, Dequeue untuk menghapus data Queue." 
     },
     { 
         question: "Pada Queue, jika elemen X masuk pada urutan ke-3, maka elemen X tersebut akan keluar pada urutan ke-berapa?\n\nA. Urutan ke-1\nB. Urutan terakhir\nC. Urutan ke-3", 
-        answer:"C", penalty:25, reward:75, explanation:"Karena FIFO, urutan masuk sama dengan urutan keluar." 
+        answer:"C", penalty:25, reward:75, explanation:"Benar! Karena FIFO, urutan masuk sama dengan urutan keluar." 
     },
 
-    // --- STACK / LIFO ---
+    // --- STACK / LIFO (5 Soal) ---
     { 
         question: "Seorang koki menumpuk piring bersih di dapur. Saat digunakan, piring paling atas diambil lebih dulu. Konsep apakah ini?\n\nA. LIFO\nB. FIFO\nC. Linear Search", 
-        answer:"A", penalty:30, reward:80, explanation:"Tumpukan piring menerapkan konsep LIFO." 
+        answer:"A", penalty:30, reward:80, explanation:"Benar! Tumpukan piring menerapkan konsep LIFO (Last In First Out)." 
     },
     { 
         question: "Struktur data tumpukan di mana operasi penambahan dan penghapusan data hanya bisa dilakukan pada ujung 'Top' dinamakan...?\n\nA. Queue\nB. Linked List\nC. Stack", 
-        answer:"C", penalty:30, reward:80, explanation:"Struktur data tersebut adalah Stack." 
+        answer:"C", penalty:30, reward:80, explanation:"Benar! Struktur data tumpukan tersebut adalah Stack." 
     },
     { 
         question: "Operasi dasar pada Stack yang berfungsi untuk memasukkan data baru ke posisi paling atas disebut...?\n\nA. Push\nB. Pop\nC. Peek", 
-        answer:"A", penalty:25, reward:70, explanation:"Push digunakan untuk menyisipkan elemen baru." 
+        answer:"A", penalty:25, reward:70, explanation:"Benar! Push digunakan untuk menyisipkan elemen baru ke Stack." 
     },
     { 
-        question: "Fitur tombol 'Undo' pada text editor menerapkan prinsip struktur data apa?\n\nA. Queue\nB. Stack\nC. Graph", 
-        answer:"B", penalty:35, reward:90, explanation:"Undo mengambil aksi terakhir (LIFO/Stack)." 
+        question: "Fitur tombol 'Undo' pada text editor (seperti VS Code atau Word) menerapkan prinsip struktur data apa?\n\nA. Queue\nB. Stack\nC. Graph", 
+        answer:"B", penalty:35, reward:90, explanation:"Benar! Undo mengambil data aksi terakhir yang kita lakukan (LIFO/Stack)." 
     },
     { 
         question: "Kondisi eror ketika kita melakukan operasi mengambil data (POP) pada tumpukan Stack yang kosong disebut...?\n\nA. Underflow\nB. Overflow\nC. Crash Error", 
-        answer:"A", penalty:30, reward:80, explanation:"Mengambil dari wadah kosong menyebabkan Underflow." 
+        answer:"A", penalty:30, reward:80, explanation:"Benar! Mengambil data dari wadah kosong menyebabkan Underflow." 
     },
 
-    // --- SORTING ---
+    // --- SORTING (5 Soal) ---
     { 
         question: "Proses menyusun dan mengurutkan data acak dari nilai terkecil ke terbesar atau sebaliknya disebut...?\n\nA. Searching\nB. Sorting\nC. Slicing", 
-        answer:"B", penalty:25, reward:70, explanation:"Mengurutkan data disebut proses sorting." 
+        answer:"B", penalty:25, reward:70, explanation:"Benar! Mengurutkan data disebut proses sorting." 
     },
     { 
         question: "Algoritma sorting yang membandingkan elemen berdekatan dan menukarnya berulang-ulang seperti gelembung adalah...?\n\nA. Quick Sort\nB. Bubble Sort\nC. Insertion Sort", 
-        answer:"B", penalty:30, reward:80, explanation:"Ciri khas Bubble Sort." 
+        answer:"B", penalty:30, reward:80, explanation:"Benar! Gelembung penukaran berdampingan adalah ciri Bubble Sort." 
     },
     { 
         question: "Metode pengurutan data dari nilai terbesar ke nilai terkecil disebut dengan istilah...?\n\nA. Ascending\nB. Hashing\nC. Descending", 
-        answer:"C", penalty:25, reward:75, explanation:"Descending artinya dari besar ke kecil." 
+        answer:"C", penalty:25, reward:75, explanation:"Benar! Descending artinya dari besar ke kecil." 
     },
     { 
         question: "Algoritma sorting yang membagi array menjadi dua bagian lalu menggabungkannya kembali secara terurut disebut...?\n\nA. Merge Sort\nB. Selection Sort\nC. Radix Sort", 
-        answer:"A", penalty:35, reward:90, explanation:"Merge Sort membagi lalu menyatukan kembali." 
+        answer:"A", penalty:35, reward:90, explanation:"Benar! Merge Sort membagi (divide) lalu menyatukan kembali (merge)." 
     },
     { 
         question: "Bila array angka [3, 1, 4] diurutkan secara Ascending, angka berapakah yang akan menempati indeks pertama (indeks 0)?\n\nA. 3\nB. 1\nC. 4", 
-        answer:"B", penalty:20, reward:70, explanation:"Setelah diurutkan menjadi [1, 3, 4], jadi indeks 0 adalah 1." 
+        answer:"B", penalty:20, reward:70, explanation:"Benar! Setelah diurutkan menjadi [1, 3, 4], jadi indeks 0 adalah angka 1." 
     },
 
-    // --- LINKED LIST ---
+    // --- LINKED LIST (5 Soal) ---
     { 
         question: "Rangkaian gerbong kereta api yang saling terhubung satu sama lain mirip dengan visualisasi struktur data...?\n\nA. Linked List\nB. Stack\nC. Matrix Array", 
-        answer:"A", penalty:35, reward:90, explanation:"Gerbong terhubung mirip Linked List." 
+        answer:"A", penalty:35, reward:90, explanation:"Benar! Gerbong terhubung via sambungan/alamat penunjuk seperti Linked List." 
     },
     { 
         question: "Komponen dasar Linked List berupa objek tunggal yang menampung data dan alamat pointer disebut dengan...?\n\nA. Element\nB. Block\nC. Node", 
-        answer:"C", penalty:30, reward:80, explanation:"Komponen penyusun Linked List dinamakan Node." 
+        answer:"C", penalty:30, reward:80, explanation:"Benar! Komponen penyusun Linked List dinamakan Node." 
     },
     { 
         question: "Pointer penunjuk khusus yang menyimpan alamat letak elemen pertama di dalam sebuah Linked List disebut...?\n\nA. Head\nB. Tail\nC. Center", 
-        answer:"A", penalty:30, reward:85, explanation:"Alamat pembuka dipegang oleh Head." 
+        answer:"A", penalty:30, reward:85, explanation:"Benar! Alamat pembuka Linked List dipegang oleh Head." 
     },
     { 
         question: "Pointer dari Node terakhir pada sebuah Single Linked List akan diarahkan ke tujuan kosong yaitu bernilai...?\n\nA. Zero\nB. Void\nC. Null", 
-        answer:"C", penalty:25, reward:80, explanation:"Ujung akhir Linked List ditandai rujukan NULL." 
+        answer:"C", penalty:25, reward:80, explanation:"Benar! Ujung akhir Linked List ditandai dengan rujukan ke NULL." 
     },
     { 
-        question: "Linked List yang memiliki dua pointer penunjuk (maju dan mundur) disebut...?\n\nA. Double Linked List\nB. Circular Linked List\nC. Binary List", 
-        answer:"A", penalty:40, reward:95, explanation:"Merupakan ciri Double Linked List." 
+        question: "Linked List yang memiliki dua pointer penunjuk (satu ke node sesudahnya dan satu ke node sebelumnya) disebut...?\n\nA. Double Linked List\nB. Circular Linked List\nC. Binary List", 
+        answer:"A", penalty:40, reward:95, explanation:"Benar! Pointer maju dan mundur merupakan ciri Double Linked List." 
     }
 ];
 
 const chanceCards = [
-    "🚀 Startup anda viral! Bonus +100 modal bisnis.", 
-    "💻 Sistem server rusak. Denda -70 uang dialokasikan ke Crypto Faucet.", 
-    "📈 Investasi AI berhasil. +120 profit masuk dompet.", 
-    "⚡ Menemukan bug efisiensi algoritma baru! Maju 3 langkah kedepan."
+    "🚀 Startup anda viral! +100 uang",
+    "💻 Sistem server rusak. Denda -70 uang masuk kas Crypto Faucet",
+    "📈 Investasi AI berhasil. +120 uang",
+    "🖨 Printer overload karena antrian panjang. Bayar denda 50 ke Crypto Faucet",
+    "⚡ Anda menemukan algoritma baru. Maju 3 langkah"
 ];
 
 const communityCards = [
-    "📦 Gudang basis data berhasil dirapikan secara modular. +80 uang", 
-    "🔌 Server mati mendadak karena kebanjiran request. Denda -60 ke Crypto Faucet.", 
-    "📊 Struktur data pelaporan berhasil diurutkan dengan rapi. +90 uang", 
-    "💰 Perusahaan rintisan mendapat kucuran dana investor baru. +100 uang"
+    "📦 Gudang data berhasil dirapikan. +80 uang",
+    "🔌 Server mati mendadak. Denda -60 uang masuk kas Crypto Faucet",
+    "📊 Data pelanggan berhasil diurutkan. +90 uang",
+    "🧠 Tim programmer menemukan bug besar. Denda -50 uang masuk kas Crypto Faucet",
+    "💰 Perusahaan mendapat investor baru. +100 uang"
 ];
 
-/* ==========================================================================
-   LOGIK GAME MECHANICS & ENGINE RUNNER
-   ========================================================================== */
 function startGame(){
     let count = parseInt(document.getElementById("playerCount").value);
-    if(isNaN(count) || count < 2 || count > 4){ 
-        alert("Jumlah Player valid berkisar antara 2 sampai 4 orang!"); 
-        return; 
+    if(isNaN(count) || count < 2 || count > 4){
+        alert("Player harus 2-4");
+        return;
     }
-    
-    bgm.play().catch(e => console.log("Audio siap"));
-    
-    players = []; 
-    turnQueue = []; 
+
+    bgm.play().catch(e => console.log("Menunggu aksi pertama user untuk menyalakan audio."));
+
+    players = [];
+    turnQueue = [];
     freeParkingPool = 0;
-    
-    updateUI(); 
+    poolDisplay.innerHTML = "Crypto Faucet Pool: 💰" + freeParkingPool;
     diceVisual.innerHTML = "🎲";
-    document.querySelectorAll(".player").forEach(e => e.remove());
+
+    tiles.forEach(tile=>{ tile.owner = null; });
+    document.querySelectorAll(".player").forEach(e=>e.remove());
 
     for(let i=0; i<count; i++){
         let player = document.createElement("div");
@@ -577,264 +520,354 @@ function startGame(){
         player.innerHTML = i+1;
         board.appendChild(player);
 
-        players.push({ 
-            name: "P" + (i+1), 
-            money: 500, 
-            position: 0, 
-            properties: [], 
-            element: player, 
+        players.push({
+            name:"P"+(i+1),
+            money:500,
+            position:0,
+            properties:[],
+            element:player,
             jailTurns: 0 
         });
         turnQueue.push(i);
     }
-    
-    gameStarted = true; 
-    isMoving = false; 
+
+    gameStarted = true;
+    isMoving = false;
     btnRoll.disabled = false;
-    
-    updateAllPlayerPositions(); 
+    updateAllPlayerPositions();
     updateUI();
-    addLog("🎮 Game dimulai! Struktur tata letak diproteksi anti-tabrakan.");
+    addLog("🎮 Game dimulai! Aktifkan audio melalui tombol di tengah jika belum terdengar.");
 }
 
-function rollDice(){
-    if(!gameStarted || isMoving) return;
-    
-    let currentPlayer = turnQueue[0];
-    if(players[currentPlayer].jailTurns > 0) {
-        players[currentPlayer].jailTurns--;
-        addLog(`🔒 ${players[currentPlayer].name} Terjebak di Cyber Jail! Turn ini hangus.`);
-        sfxWrong.play(); 
-        nextTurn(); 
-        return;
-    }
-    
-    isMoving = true; 
-    btnRoll.disabled = true;
-    sfxDice.currentTime = 0; 
-    sfxDice.play().catch(e => console.log(e));
-    
-    let counter = 0;
-    let rollInterval = setInterval(() => {
-        diceVisual.innerHTML = diceFaces[Math.floor(Math.random() * 6) + 1];
-        counter++;
-        
-        if(counter > 6) {
-            clearInterval(rollInterval);
-            let dice = Math.floor(Math.random() * 6) + 1;
-            diceVisual.innerHTML = diceFaces[dice] + " (" + dice + ")";
-            addLog("🎲 " + players[currentPlayer].name + " mendapatkan dadu " + dice);
-            movePlayer(currentPlayer, dice);
-        }
-    }, 100);
-}
-
-function movePlayer(playerIndex, steps){
-    let count = 0;
-    let interval = setInterval(() => {
-        players[playerIndex].position++;
-        sfxStep.currentTime = 0; 
-        sfxStep.play().catch(e => console.log(e));
-        
-        if(players[playerIndex].position >= tiles.length){
-            players[playerIndex].position = 0; 
-            players[playerIndex].money += 150;
-            addLog("💰 " + players[playerIndex].name + " melewati ubin START (+150)");
-        }
-        
-        updateAllPlayerPositions(); 
-        count++;
-        
-        if(count >= steps){ 
-            clearInterval(interval); 
-            setTimeout(() => { processTile(playerIndex); }, 200); 
-        }
-    }, 400);
-}
-
-function processTile(playerIndex){
-    let tile = tiles[players[playerIndex].position];
-    
-    if(players[playerIndex].position === GO_TO_JAIL_INDEX) {
-        sfxWrong.play(); 
-        alert(`🚨 ${players[playerIndex].name} melakukan Illegal Access! Masuk Cyber Jail.`);
-        players[playerIndex].position = CYBER_JAIL_INDEX; 
-        players[playerIndex].jailTurns = 1;
-        updateAllPlayerPositions(); 
-        nextTurn(); 
-        return;
-    }
-    
-    if(players[playerIndex].position === FREE_PARKING_INDEX) {
-        if(freeParkingPool > 0) {
-            sfxCorrect.play(); 
-            alert(`🎁 Crypto Faucet Meledak! Anda mendapatkan gratis +💰${freeParkingPool}`);
-            players[playerIndex].money += freeParkingPool; 
-            freeParkingPool = 0;
-        }
-    }
-    
-    if(tile.type === "property"){
-        if(tile.owner === null){
-            if(confirm(`Beli aset ${tile.name} seharga (💰${tile.price})?`)){
-                if(players[playerIndex].money >= tile.price){
-                    players[playerIndex].money -= tile.price; 
-                    tile.owner = playerIndex;
-                    players[playerIndex].properties.push(tile.name);
-                } else { 
-                    sfxWrong.play(); 
-                    alert("Modal bisnis kamu tidak cukup!"); 
-                }
-            }
-        } else if(tile.owner !== playerIndex){
-            sfxWrong.play(); 
-            players[playerIndex].money -= tile.rent; 
-            players[tile.owner].money += tile.rent;
-            addLog(`💸 ${players[playerIndex].name} Bayar Sewa ke ${players[tile.owner].name}`);
-        }
-        
-        showChallenge(playerIndex); 
-        return;
-    }
-    
-    if(tile.type === "chance"){
-        let card = chanceCards[Math.floor(Math.random() * chanceCards.length)]; 
-        alert(card);
-        if(card.includes("+100")) { players[playerIndex].money += 100; }
-        if(card.includes("-70"))  { players[playerIndex].money -= 70; freeParkingPool += 70; }
-        if(card.includes("+120")) { players[playerIndex].money += 120; }
-        if(card.includes("Maju 3")) { 
-            players[playerIndex].position += 3; 
-            updateAllPlayerPositions(); 
-        }
-    }
-    
-    if(tile.type === "community"){
-        let card = communityCards[Math.floor(Math.random() * communityCards.length)]; 
-        alert(card);
-        if(card.includes("+80"))  { players[playerIndex].money += 80; }
-        if(card.includes("+90"))  { players[playerIndex].money += 90; }
-        if(card.includes("+100")) { players[playerIndex].money += 100; }
-        if(card.includes("-60"))  { players[playerIndex].money -= 60; freeParkingPool += 60; }
-    }
-    
-    nextTurn();
-}
-
-function showChallenge(playerIndex){
-    let challenge = storyChallenges[Math.floor(Math.random() * storyChallenges.length)];
-    let choose = confirm(`⚡ TANTANGAN STRUKTUR DATA!\n\nJawab kuis untuk mendapatkan modal gratis atau Cancel jika ingin lewat & denda 💰${challenge.penalty}`);
-    
-    if(choose){
-        let ans = prompt(challenge.question + "\n\nKetik Jawaban Anda (A, B, atau C):");
-        if(ans && ans.toUpperCase().trim() === challenge.answer){
-            sfxCorrect.play(); 
-            alert("✅ JAWABAN BENAR!\n\n" + challenge.explanation); 
-            players[playerIndex].money += challenge.reward;
-            addLog("✅ " + players[playerIndex].name + " menjawab BENAR (+ " + challenge.reward + ")");
-        } else {
-            sfxWrong.play(); 
-            alert(`❌ JAWABAN SALAH!\n\nKunci jawaban yang benar adalah ${challenge.answer}.\n${challenge.explanation}\nDenda dipotong menuju Crypto Faucet Pool.`);
-            players[playerIndex].money -= challenge.penalty; 
-            freeParkingPool += challenge.penalty;
-            addLog("❌ " + players[playerIndex].name + " menjawab SALAH (-" + challenge.penalty + ")");
-        }
-    } else { 
-        players[playerIndex].money -= challenge.penalty; 
-        freeParkingPool += challenge.penalty; 
-        addLog("💸 " + players[playerIndex].name + " skip tantangan, denda ditampung Crypto Faucet.");
-    }
-    
-    nextTurn();
-}
-
-/* ==========================================================================
-   GRAPHICAL RENDER UPDATER & REFRESH HANDLER
-   ========================================================================== */
 function updateAllPlayerPositions(){
-    tiles.forEach((tile, tileIndex) => {
+    tiles.forEach((tile,tileIndex)=>{
         let playersInTile = [];
-        players.forEach((p, idx) => { 
-            if(p.position === tileIndex) { playersInTile.push({p:p, idx:idx}); }
+        players.forEach((player,index)=>{
+            if(player.position === tileIndex){
+                playersInTile.push({ player:player, index:index });
+            }
         });
 
-        playersInTile.forEach((data, order) => {
-            let baseOffsetX = 2; 
-            let baseOffsetY = 2;
-            if(order === 1) { baseOffsetX = 8; }
-            if(order === 2) { baseOffsetY = 8; }
-            if(order === 3) { baseOffsetX = 8; baseOffsetY = 8; }
-            
-            data.p.element.style.left = `calc(${tile.x}% + ${baseOffsetX}px)`;
-            data.p.element.style.top = `calc(${tile.y}% + ${baseOffsetY}px)`;
+        playersInTile.forEach((data,order)=>{
+            let playerSize = 20;
+            let spacing = 3;
+            let cols = 2;
+            let row = Math.floor(order / cols);
+            let col = order % cols;
+            let offsetX = 8 + (col * (playerSize + spacing));
+            let offsetY = 8 + (row * (playerSize + spacing));
+
+            data.player.element.style.left = (tile.x + offsetX) + "px";
+            data.player.element.style.top = (tile.y + offsetY) + "px";
         });
     });
 }
 
 function updateUI(){
     const boxes = [
-        document.getElementById("p1box"), 
-        document.getElementById("p2box"), 
-        document.getElementById("p3box"), 
+        document.getElementById("p1box"),
+        document.getElementById("p2box"),
+        document.getElementById("p3box"),
         document.getElementById("p4box")
     ];
-    
-    boxes.forEach(b => { 
-        if(b) b.innerHTML = "<span style='color:#aaa; font-style:italic;'>Offline</span>"; 
-    });
 
-    players.forEach((player, index) => {
-        let propsHTML = player.properties.length > 0 ? 
-            `<ol class='property-list'>` + player.properties.map(p=>`<li>${p}</li>`).join("") + `</ol>` : 
-            "<br><span style='font-size:12px; color:#aaa; padding-left:10px;'>Belum ada aset</span>";
-            
+    boxes.forEach(box=>box.innerHTML="");
+
+    players.forEach((player,index)=>{
+        let propsHTML = "";
+        if(player.properties.length > 0) {
+            propsHTML = "<ol class='property-list'>";
+            player.properties.forEach(p => { propsHTML += `<li>${p}</li>`; });
+            propsHTML += "</ol>";
+        } else {
+            propsHTML = "<br><span style='font-size:11px; color:#aaa; padding-left:15px;'>Belum ada properti</span>";
+        }
+
         let statusJail = player.jailTurns > 0 ? ` <span style="color:red;">(🔒 Jailed)</span>` : "";
-        
+
         boxes[index].innerHTML = `
-            <h3 style="color:${colors[index]};">${player.name}${statusJail}</h3>
-            💰 Uang: <b style="color:#1dd1a1;">${player.money}</b><br>
-            🏠 Total Aset: <b>${player.properties.length}</b>
+            <h3 style="color:${colors[index]}; margin: 2px 0;">${player.name}${statusJail}</h3>
+            💰 Money: ${player.money}<br>
+            🏠 Jumlah Properti: ${player.properties.length}
+            <div style="font-weight:bold; margin-top:3px; font-size:11px;">Daftar Properti:</div>
             ${propsHTML}
         `;
     });
 
     poolDisplay.innerHTML = "Crypto Faucet Pool: 💰" + freeParkingPool;
-    
+
     if (turnQueue.length > 0 && gameStarted) {
         turnInfo.innerHTML = "🎯 Giliran " + players[turnQueue[0]].name;
-        queueDisplay.innerHTML = turnQueue.map(i => `<span style="color:${colors[i]}">[${players[i].name}]</span>`).join(" ➜ ");
+        let queueText = "";
+        turnQueue.forEach(index=>{
+            queueText += `<span style="color:${colors[index]}">[${players[index].name}]</span> ➜ `;
+        });
+        queueDisplay.innerHTML = queueText;
     }
 }
 
-function nextTurn(){ 
-    if(!checkWinner()){ 
-        turnQueue.push(turnQueue.shift()); 
-        isMoving = false; 
+function addLog(text){
+    logBox.innerHTML += text + "<br>";
+    logBox.scrollTop = logBox.scrollHeight;
+}
+
+function rollDice(){
+    if(!gameStarted || isMoving) return;
+
+    let currentPlayer = turnQueue[0];
+
+    if(players[currentPlayer].jailTurns > 0) {
+        players[currentPlayer].jailTurns--;
+        addLog(`🔒 ${players[currentPlayer].name} berada di Cyber Jail dan kehilangan putaran ini! (Sisa hukuman: ${players[currentPlayer].jailTurns} turn)`);
+        sfxWrong.currentTime = 0;
+        sfxWrong.play();
+        alert(`🔒 ${players[currentPlayer].name} kehilangan turn saat ini karena dipenjara.`);
+        nextTurn();
+        return;
+    }
+
+    isMoving = true; 
+    btnRoll.disabled = true; 
+    btnRoll.innerHTML = "🎲 Rolling...";
+
+    sfxDice.currentTime = 0;
+    sfxDice.play().catch(e=>console.log(e));
+
+    let counter = 0;
+    let rollInterval = setInterval(() => {
+        let randomFace = Math.floor(Math.random() * 6) + 1;
+        diceVisual.innerHTML = diceFaces[randomFace];
+        counter++;
+        
+        if(counter > 6) {
+            clearInterval(rollInterval);
+            
+            let dice = Math.floor(Math.random()*6)+1;
+            diceVisual.innerHTML = diceFaces[dice] + " (" + dice + ")";
+            btnRoll.innerHTML = "🎲 Roll Dice";
+
+            addLog("🎲 " + players[currentPlayer].name + " mendapat angka " + dice);
+            movePlayer(currentPlayer, dice);
+        }
+    }, 100);
+}
+
+function movePlayer(playerIndex,steps){
+    let count = 0;
+    let interval = setInterval(()=>{
+        players[playerIndex].position++;
+
+        sfxStep.currentTime = 0;
+        sfxStep.play().catch(e=>console.log(e));
+
+        if(players[playerIndex].position >= tiles.length){
+            players[playerIndex].position = 0;
+            players[playerIndex].money += 150;
+            addLog("💰 " + players[playerIndex].name + " melewati START (+150)");
+        }
+
+        updateAllPlayerPositions();
+        count++;
+
+        if(count >= steps){
+            clearInterval(interval);
+            setTimeout(() => { processTile(playerIndex); }, 200); 
+        }
+    },400);
+}
+
+function processTile(playerIndex){
+    let tile = tiles[players[playerIndex].position];
+    addLog("📍 " + players[playerIndex].name + " berada di " + tile.name);
+
+    if(players[playerIndex].position === GO_TO_JAIL_INDEX) {
+        sfxWrong.currentTime = 0;
+        sfxWrong.play();
+        alert(`🚨 Ouch! ${players[playerIndex].name} melakukan illegal hacking! Anda dikirim langsung ke Cyber Jail.`);
+        players[playerIndex].position = CYBER_JAIL_INDEX; 
+        players[playerIndex].jailTurns = 1; 
+        addLog(`🚨 ${players[playerIndex].name} dipindahkan ke Cyber Jail dan terkena skip status.`);
+        updateAllPlayerPositions();
+        nextTurn();
+        return;
+    }
+
+    if(players[playerIndex].position === FREE_PARKING_INDEX) {
+        sfxFaucet.currentTime = 0;
+        sfxFaucet.play().catch(e => console.log(e));
+
+        if(freeParkingPool > 0) {
+            alert(`🎁 CRYPTO FAUCET! ${players[playerIndex].name} mendapatkan bonus koin terkumpul gratis sebesar 💰${freeParkingPool}!`);
+            players[playerIndex].money += freeParkingPool;
+            addLog(`🎁 ${players[playerIndex].name} menguras Crypto Faucet sebesar +${freeParkingPool}`);
+            freeParkingPool = 0;
+        } else {
+            alert(`🟢 Anda singgah di Crypto Faucet, sayangnya tangki koin sedang kosong.`);
+            addLog(`🟢 ${players[playerIndex].name} singgah di Crypto Faucet.`);
+        }
+    }
+
+    if(tile.type === "property"){
+        if(tile.owner === null){
+            let buy = confirm(tile.name + "\nHarga: " + tile.price + "\nBeli properti?");
+            if(buy){
+                if(players[playerIndex].money >= tile.price){
+                    players[playerIndex].money -= tile.price;
+                    tile.owner = playerIndex;
+                    players[playerIndex].properties.push(tile.name);
+                    addLog("🏠 " + players[playerIndex].name + " membeli " + tile.name);
+                    
+                    sfxBuy.currentTime = 0;
+                    sfxBuy.play().catch(e => console.log(e));
+                } else {
+                    sfxWrong.currentTime = 0;
+                    sfxWrong.play();
+                    alert("Uang tidak cukup");
+                }
+            }
+        }
+        else if(tile.owner !== null && tile.owner !== playerIndex){
+            sfxWrong.currentTime = 0;
+            sfxWrong.play();
+            players[playerIndex].money -= tile.rent;
+            players[tile.owner].money += tile.rent;
+            addLog("💸 " + players[playerIndex].name + " membayar sewa ke " + players[tile.owner].name);
+        }
+
+        showChallenge(playerIndex);
+        return; 
+    }
+
+    if(tile.type === "chance"){ processChance(playerIndex); return; }
+    if(tile.type === "community"){ processCommunity(playerIndex); return; }
+
+    if(tile.type === "safe" || tile.type === "start" || tile.type === "jail"){
+        if(players[playerIndex].position === CYBER_JAIL_INDEX && players[playerIndex].jailTurns === 0) {
+            addLog("🟢 Safe Zone: Berkunjung saja ke Cyber Jail.");
+        } else if (players[playerIndex].position !== FREE_PARKING_INDEX) {
+            addLog("🟢 Safe Zone");
+        }
+    }
+
+    nextTurn();
+}
+
+function processChance(playerIndex){
+    let card = chanceCards[Math.floor(Math.random()*chanceCards.length)];
+    
+    sfxCard.currentTime = 0;
+    sfxCard.play().catch(e => console.log(e));
+
+    alert("🎴 KESEMPATAN\n\n" + card);
+    addLog("🎴 " + card);
+
+    if(card.includes("+100")) players[playerIndex].money += 100;
+    if(card.includes("+120")) players[playerIndex].money += 120;
+    if(card.includes("-70")) { players[playerIndex].money -= 70; freeParkingPool += 70; }
+    if(card.includes("Bayar denda 50")) { players[playerIndex].money -= 50; freeParkingPool += 50; }
+    if(card.includes("Maju 3")){
+        players[playerIndex].position += 3;
+        if(players[playerIndex].position >= tiles.length){ players[playerIndex].position %= tiles.length; }
+        updateAllPlayerPositions();
+    }
+    nextTurn();
+}
+
+function processCommunity(playerIndex){
+    let card = communityCards[Math.floor(Math.random()*communityCards.length)];
+    
+    sfxCard.currentTime = 0;
+    sfxCard.play().catch(e => console.log(e));
+
+    alert("📦 DANA UMUM\n\n" + card);
+    addLog("📦 " + card);
+
+    if(card.includes("+80")) players[playerIndex].money += 80;
+    if(card.includes("+90")) players[playerIndex].money += 90;
+    if(card.includes("+100")) players[playerIndex].money += 100;
+    if(card.includes("-60")) { players[playerIndex].money -= 60; freeParkingPool += 60; }
+    if(card.includes("-50")) { players[playerIndex].money -= 50; freeParkingPool += 50; }
+    nextTurn();
+}
+
+function showChallenge(playerIndex){
+    let challenge = storyChallenges[Math.floor(Math.random()*storyChallenges.length)];
+    
+    let choose = confirm("⚡ TANTANGAN STRUKTUR DATA!\n\nJawab kuis Pilihan Ganda untuk mendapatkan bonus modal.\n\nOK = Jawab Kuis\nCancel = Lewati & Bayar Denda 💰" + challenge.penalty + " ke Crypto Faucet");
+
+    if(choose){
+        let ans = prompt(challenge.question + "\n\nKetik Jawaban Anda (A, B, atau C):");
+
+        if(ans && ans.toUpperCase().trim() === challenge.answer) {
+            sfxCorrect.currentTime = 0;
+            sfxCorrect.play().catch(e=>console.log(e));
+
+            alert("✅ BENAR!\n\n" + challenge.explanation);
+            players[playerIndex].money += challenge.reward;
+            addLog("✅ " + players[playerIndex].name + " menjawab BENAR (+ " + challenge.reward + ")");
+        } else {
+            sfxWrong.currentTime = 0;
+            sfxWrong.play().catch(e=>console.log(e));
+
+            alert("❌ SALAH!\n\nJawaban yang benar adalah " + challenge.answer + ".\n" + challenge.explanation + `\nDenda dialokasikan ke Crypto Faucet.`);
+            players[playerIndex].money -= challenge.penalty;
+            freeParkingPool += challenge.penalty;
+            addLog("❌ " + players[playerIndex].name + " menjawab SALAH (-" + challenge.penalty + ")");
+        }
+    } else {
+        sfxWrong.currentTime = 0;
+        sfxWrong.play().catch(e=>console.log(e));
+        players[playerIndex].money -= challenge.penalty;
+        freeParkingPool += challenge.penalty;
+        addLog("💸 " + players[playerIndex].name + " skip tantangan, denda masuk Crypto Faucet (-" + challenge.penalty + ")");
+    }
+
+    nextTurn();
+}
+
+function nextTurn(){
+    if (!checkWinner()) {
+        turnQueue.push(turnQueue.shift());
+        isMoving = false;
         btnRoll.disabled = false; 
-        updateUI(); 
-    } 
+        updateUI();
+    }
 }
 
 function checkWinner(){
-    for (let p of players) {
-        if(p.money >= targetMoney){ 
-            alert(`🏆 FINISH! ${p.name} MENANG PERMAINAN dengan total modal 💰${p.money}!`); 
-            gameStarted = false; 
-            return true; 
+    let gameOver = false;
+
+    for (let player of players) {
+        if(player.money >= targetMoney){
+            sfxWin.currentTime = 0;
+            sfxWin.play().catch(e => console.log(e));
+
+            alert(`🎉 SELAMAT! ${player.name} adalah WINNER 🏆 karena berhasil mengumpulkan uang sebanyak 💰${player.money} (Target: ${targetMoney})!`);
+            addLog(`🏆 ${player.name} MENANG PERMAINAN!`);
+            gameOver = true;
+            break;
         }
-        if(p.money <= 0){ 
-            alert(`💀 GAME OVER! ${p.name} dinyatakan BANGKRUT total.`); 
-            gameStarted = false; 
-            return true; 
+        if(player.money <= 0){
+            sfxLose.currentTime = 0;
+            sfxLose.play().catch(e => console.log(e));
+
+            alert(`😭 ANDA BANGKRUT! ${player.name} mendapatkan gelar KEKALAHAN karena kehabisan modal bisnis.`);
+            addLog(`💀 ${player.name} BANGKRUT! Game Selesai.`);
+            gameOver = true;
+            break;
         }
+    }
+
+    if (gameOver) {
+        gameStarted = false;
+        btnRoll.disabled = true;
+        turnInfo.innerHTML = "🏁 GAME OVER 🏁";
+        queueDisplay.innerHTML = "Permainan telah berakhir.";
+        return true;
     }
     return false;
 }
-
-function addLog(text){ 
-    logBox.innerHTML += text + "<br>"; 
-    logBox.scrollTop = logBox.scrollHeight; 
-}
 </script>
+
 </body>
 </html>
