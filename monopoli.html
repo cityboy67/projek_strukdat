@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECHOPOLY - Monopoly Struktur Data</title>
+
+<style>
+/* 1. BACKGROUND & ESTETIKA BARU: Tema Dark Tech / Cyberpunk Modern */
+body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle, #1e272e 0%, #0f141c 100%);
+    color: #ffffff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 15px;
+    color: #00d2d3;
+    text-shadow: 0 0 10px rgba(0, 210, 211, 0.5);
+}
+
+.top-control {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+input {
+    padding: 10px;
+    width: 150px;
+    border: 2px solid #34495e;
+    background: #2c3e50;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #10ac84;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 0 #0b8463;
+    transition: all 0.1s ease;
+}
+
+button:hover { background: #1dd1a1; }
+button:active { transform: translateY(4px); box-shadow: none; }
+button:disabled { background: #57606f; box-shadow: none; cursor: not-allowed; }
+
+.turn-box {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #ff9f43;
+}
+
+.queue-box {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.game-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+/* BOARD UPGRADE: Efek neon border glowing */
+.board {
+    width: 900px;
+    height: 900px;
+    background: #222f3e;
+    border: 5px solid #00d2d3;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 210, 211, 0.3);
+}
+
+.tile {
+    position: absolute;
+    border: 1px solid #10ac84;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px;
+    color: #ffffff;
+}
+
+.corner {
+    width: 140px;
+    height: 140px;
+    background: #341f97;
+    color: #ffffff;
+    border: 1px solid #5f27cd;
+}
+
+.horizontal { width: 88px; height: 140px; }
+.vertical { width: 140px; height: 88px; }
+
+.property { background: #2e86de; }
+.chance { background: #833471; }
+.community { background: #e15f41; }
+.safe { background: #576574; }
+.jail { background: #ee5253; }
+
+.center-area {
+    position: absolute;
+    width: 532px;
+    height: 532px;
+    left: 184px;
+    top: 184px;
+    background: #1e272e;
+    border: 5px dashed #00d2d3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.center-area h1 { font-size: 55px; margin: 0; color: #00d2d3; }
+.center-area p { font-size: 20px; color: #84817a; margin: 5px 0; }
+
+.dice-visual {
+    font-size: 45px;
+    margin-top: 15px;
+    background: #2c3e50;
+    padding: 10px 20px;
+    border: 3px solid #00d2d3;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    color: white;
+}
+
+.player {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 999;
+    transition: all .3s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border: 2px solid white;
+    box-shadow: 0 0 8px rgba(255,255,255,0.8);
+}
+
+.player-info {
+    position: absolute;
+    width: 180px;
+    background: #2c3e50;
+    border: 2px solid #34495e;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    font-size: 14px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#p1box{ left:10px; top:140px; }
+#p2box{ right:10px; top:140px; }
+#p3box{ left:10px; bottom:20px; }
+#p4box{ right:10px; bottom:20px; }
+
+.log {
+    width: 600px;
+    margin: 20px auto;
+    background: #2c3e50;
+    border: 1px solid #34495e;
+    border-radius: 10px;
+    padding: 15px;
+    height: 180px;
+    overflow: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    color: #c8d6e5;
+}
+
+.property-list { margin-top: 5px; padding-left: 15px; font-size: 11px; color: #ffdd59; }
+.audio-control { margin-top: 10px; font-size: 13px; color: #ff9f43; cursor: pointer; text-decoration: underline; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>🎲 TECHOPOLY MONOPOLY</h1>
+
+<div class="top-control">
+    <input type="number" id="playerCount" min="2" max="4" placeholder="2-4 Player">
+    <button id="btnStart" onclick="startGame()">Start Game</button>
+    <button id="btnRoll" onclick="rollDice()">🎲 Roll Dice</button>
+</div>
+
+<div class="turn-box" id="turnInfo">Masukkan jumlah player</div>
+<div class="queue-box" id="queueDisplay"></div>
+
+<div class="game-container">
+    <div id="p1box" class="player-info"></div>
+    <div id="p2box" class="player-info"></div>
+    <div id="p3box" class="player-info"></div>
+    <div id="p4box" class="player-info"></div>
+
+    <div class="board" id="board">
+        <div class="center-area">
+            <h1>TECHOPOLY</h1>
+            <p>Monopoly Struktur Data</p>
+            <p id="poolDisplay" style="font-size: 16px; margin-top: 10px; color: #ffff2e; font-weight: bold;">Crypto Faucet Pool: 💰0</p>
+            <div id="diceVisual" class="dice-visual">🎲</div>
+            <div class="audio-control" onclick="toggleBGM()">🎵 Aktifkan/Mute Backsound</div>
+        </div>
+    </div>
+</div>
+
+<div class="log" id="log"></div>
+
+<audio id="bgm" loop src="https://glichet.github.io/hosting-assets/synth_bgm_8bit.mp3" preload="auto"></audio>
+<audio id="sfxDice" src="assets/sound effect/efek-roll-dice.mp3" preload="auto"></audio>
+<audio id="sfxStep" src="assets/sound effect/efek-melangkah.mp3" preload="auto"></audio>
+<audio id="sfxCorrect" src="assets/sound effect/family-feud-good-answer.mp3" preload="auto"></audio>
+<audio id="sfxWrong" src="assets/sound effect/nope-construction-worker-tf2-gaming-sound-effect-hd_ai7HT0p.mp3" preload="auto"></audio>
+
+<audio id="sfxFaucet" src="assets/sound effect/achievements2.mp3" preload="auto"></audio>
+<audio id="sfxBuy" src="assets/sound effect/getmoney.mp3" preload="auto"></audio>
+<audio id="sfxCard" src="assets/sound effect/achievements.mp3" preload="auto"></audio>
+<audio id="sfxWin" src="assets/sound effect/windah-absolute-cinema.mp3" preload="auto"></audio>
+<audio id="sfxLose" src="assets/sound effect/kucing-ketawa.mp3" preload="auto"></audio>
+
+<script>
+const board = document.getElementById("board");
+const logBox = document.getElementById("log");
+const turnInfo = document.getElementById("turnInfo");
+const queueDisplay = document.getElementById("queueDisplay");
+const poolDisplay = document.getElementById("poolDisplay");
+const diceVisual = document.getElementById("diceVisual");
+const btnRoll = document.getElementById("btnRoll");
+
+// Audio Selector Utama
+const bgm = document.getElementById("bgm");
+const sfxDice = document.getElementById("sfxDice");
+const sfxStep = document.getElementById("sfxStep");
+const sfxCorrect = document.getElementById("sfxCorrect");
+const sfxWrong = document.getElementById("sfxWrong");
+
+// Audio Selector Slot Baru Anda
+const sfxFaucet = document.getElementById("sfxFaucet");
+const sfxBuy = document.getElementById("sfxBuy");
+const sfxCard = document.getElementById("sfxCard");
+const sfxWin = document.getElementById("sfxWin");
+const sfxLose = document.getElementById("sfxLose");
+
+const colors = ["#ff4d4d", "#3498db", "#2ecc71", "#f1c40f"];
+const diceFaces = ["🎲", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+
+let players = [];
+let turnQueue = [];
+let gameStarted = false;
+let isMoving = false;
+let freeParkingPool = 0; 
+
+const targetMoney = 1000; 
+const tiles = [];
+
+const CYBER_JAIL_INDEX = 8;
+const FREE_PARKING_INDEX = 16;
+const GO_TO_JAIL_INDEX = 24;
+
+// Atur Volume Suara
+bgm.volume = 0.2;
+sfxDice.volume = 0.6;
+sfxStep.volume = 0.5;
+sfxCorrect.volume = 0.6;
+sfxWrong.volume = 0.6;
+
+// Atur Volume Suara Slot Baru
+sfxFaucet.volume = 0.6;
+sfxBuy.volume = 0.6;
+sfxCard.volume = 0.6;
+sfxWin.volume = 0.7;
+sfxLose.volume = 0.7;
+
+function toggleBGM() {
+    if (bgm.paused) {
+        bgm.play().catch(e => alert("Silakan klik sembarang area di web/board terlebih dahulu, baru nyalakan musiknya kembali!"));
+        addLog("🎵 Backsound diaktifkan.");
+    } else {
+        bgm.pause();
+        addLog("🎵 Backsound dimatikan (Mute).");
+    }
+}
+
+function createTiles(){
+    tiles.length = 0;
+    const names = [
+        "START", "Jakarta Digital City", "Dana Umum", "Bandung Startup Hub", "Safe Zone", "Kesempatan", "Tokyo Tech Center", "Cloud District",
+        "Cyber Jail", "AI Innovation Lab", "Dana Umum", "Singapore Data Center", "Safe Zone", "Kesempatan", "Queue Financial Bank", "Sorting Factory",
+        "Crypto Faucet", "Stack Warehouse", "Dana Umum", "Programming Campus", "Safe Zone", "Kesempatan", "Database Central", "Bug Hunter Zone",
+        "Go To Jail", "Data Mining Lab", "Dana Umum", "Security Server", "Safe Zone", "Kesempatan", "Algorithm Center", "Internet Tower"
+    ];
+
+    let path = [];
+    path.push({x:760,y:760,w:140,h:140});
+    for(let i=0;i<7;i++) { path.push({x:672-(i*88), y:760, w:88, h:140}); }
+    path.push({x:0,y:760,w:140,h:140});
+    for(let i=0;i<7;i++) { path.push({x:0, y:672-(i*88), w:140, h:88}); }
+    path.push({x:0,y:0,w:140,h:140});
+    for(let i=0;i<7;i++) { path.push({x:140+(i*88), y:0, w:88, h:140}); }
+    path.push({x:760,y:0,w:140,h:140});
+    for(let i=0;i<7;i++) { path.push({x:760, y:140+(i*88), w:140, h:88}); }
+
+    for(let i=0;i<32;i++){
+        let type = "property";
+        if(names[i].includes("Dana")) type = "community";
+        if(names[i].includes("Kesempatan")) type = "chance";
+        if(names[i].includes("Safe")) type = "safe";
+        if(names[i].includes("Jail")) type = "jail";
+        if(names[i] === "START") type = "start";
+        if(names[i] === "Crypto Faucet") type = "safe";
+        if(names[i] === "Go To Jail") type = "jail";
+
+        tiles.push({
+            name:names[i],
+            type:type,
+            price:100 + (i*5),
+            rent:20 + (i*2),
+            owner:null,
+            x:path[i].x, y:path[i].y, w:path[i].w, h:path[i].h
+        });
+    }
+}
+createTiles();
+
+function createBoard(){
+    document.querySelectorAll(".tile").forEach(e => e.remove());
+    tiles.forEach(tile=>{
+        let div = document.createElement("div");
+        div.classList.add("tile");
+        if(tile.w === 140 && tile.h === 140) { div.classList.add("corner"); }
+        else if(tile.h === 140) { div.classList.add("horizontal"); }
+        else { div.classList.add("vertical"); }
+
+        if(tile.type === "property") div.classList.add("property");
+        if(tile.type === "chance") div.classList.add("chance");
+        if(tile.type === "community") div.classList.add("community");
+        if(tile.type === "safe") div.classList.add("safe");
+        if(tile.type === "jail") div.classList.add("jail");
+
+        div.style.left = tile.x + "px";
+        div.style.top = tile.y + "px";
+        div.innerHTML = tile.name;
+        board.appendChild(div);
+    });
+}
+createBoard();
+
+/* 2. BANK SOAL: 20 Soal Pilihan Ganda (A, B, C) Masing-Masing Materi Ada 5 Soal */
+const storyChallenges = [
+    // --- QUEUE / FIFO (5 Soal) ---
+    { 
+        question: "Di sebuah bank digital, pelanggan yang datang lebih dulu selalu dilayani terlebih dahulu agar sistem tetap adil. Sistem apakah ini?\n\nA. FIFO\nB. LIFO\nC. Random Access", 
+        answer:"A", penalty:30, reward:80, explanation:"Benar! Bank menggunakan konsep antrean FIFO (First In First Out)." 
+    },
+    { 
+        question: "Struktur data linier yang menyisipkan data dari belakang (rear) dan menghapus dari depan (front) disebut...?\n\nA. Stack\nB. Queue\nC. Tree", 
+        answer:"B", penalty:30, reward:80, explanation:"Benar! Itu adalah mekanisme dari Queue (Antrean)." 
+    },
+    { 
+        question: "Kondisi eror ketika mencoba memasukkan data baru ke dalam Queue yang kapasitasnya sudah penuh disebut...?\n\nA. Underflow\nB. Shadowing\nC. Overflow", 
+        answer:"C", penalty:25, reward:70, explanation:"Benar! Kondisi penuh pada struktur data disebut Overflow." 
+    },
+    { 
+        question: "Operasi untuk mengeluarkan atau menghapus elemen pertama dari sebuah struktur data Queue dinamakan...?\n\nA. Enqueue\nB. Dequeue\nC. Pop", 
+        answer:"B", penalty:30, reward:85, explanation:"Benar! Enqueue untuk menambah, Dequeue untuk menghapus data Queue." 
+    },
+    { 
+        question: "Pada Queue, jika elemen X masuk pada urutan ke-3, maka elemen X tersebut akan keluar pada urutan ke-berapa?\n\nA. Urutan ke-1\nB. Urutan terakhir\nC. Urutan ke-3", 
+        answer:"C", penalty:25, reward:75, explanation:"Benar! Karena FIFO, urutan masuk sama dengan urutan keluar." 
+    },
+
+    // --- STACK / LIFO (5 Soal) ---
+    { 
+        question: "Seorang koki menumpuk piring bersih di dapur. Saat digunakan, piring paling atas diambil lebih dulu. Konsep apakah ini?\n\nA. LIFO\nB. FIFO\nC. Linear Search", 
+        answer:"A", penalty:30, reward:80, explanation:"Benar! Tumpukan piring menerapkan konsep LIFO (Last In First Out)." 
+    },
+    { 
+        question: "Struktur data tumpukan di mana operasi penambahan dan penghapusan data hanya bisa dilakukan pada ujung 'Top' dinamakan...?\n\nA. Queue\nB. Linked List\nC. Stack", 
+        answer:"C", penalty:30, reward:80, explanation:"Benar! Struktur data tumpukan tersebut adalah Stack." 
+    },
+    { 
+        question: "Operasi dasar pada Stack yang berfungsi untuk memasukkan data baru ke posisi paling atas disebut...?\n\nA. Push\nB. Pop\nC. Peek", 
+        answer:"A", penalty:25, reward:70, explanation:"Benar! Push digunakan untuk menyisipkan elemen baru ke Stack." 
+    },
+    { 
+        question: "Fitur tombol 'Undo' pada text editor (seperti VS Code atau Word) menerapkan prinsip struktur data apa?\n\nA. Queue\nB. Stack\nC. Graph", 
+        answer:"B", penalty:35, reward:90, explanation:"Benar! Undo mengambil data aksi terakhir yang kita lakukan (LIFO/Stack)." 
+    },
+    { 
+        question: "Kondisi eror ketika kita melakukan operasi mengambil data (POP) pada tumpukan Stack yang kosong disebut...?\n\nA. Underflow\nB. Overflow\nC. Crash Error", 
+        answer:"A", penalty:30, reward:80, explanation:"Benar! Mengambil data dari wadah kosong menyebabkan Underflow." 
+    },
+
+    // --- SORTING (5 Soal) ---
+    { 
+        question: "Proses menyusun dan mengurutkan data acak dari nilai terkecil ke terbesar atau sebaliknya disebut...?\n\nA. Searching\nB. Sorting\nC. Slicing", 
+        answer:"B", penalty:25, reward:70, explanation:"Benar! Mengurutkan data disebut proses sorting." 
+    },
+    { 
+        question: "Algoritma sorting yang membandingkan elemen berdekatan dan menukarnya berulang-ulang seperti gelembung adalah...?\n\nA. Quick Sort\nB. Bubble Sort\nC. Insertion Sort", 
+        answer:"B", penalty:30, reward:80, explanation:"Benar! Gelembung penukaran berdampingan adalah ciri Bubble Sort." 
+    },
+    { 
+        question: "Metode pengurutan data dari nilai terbesar ke nilai terkecil disebut dengan istilah...?\n\nA. Ascending\nB. Hashing\nC. Descending", 
+        answer:"C", penalty:25, reward:75, explanation:"Benar! Descending artinya dari besar ke kecil." 
+    },
+    { 
+        question: "Algoritma sorting yang membagi array menjadi dua bagian lalu menggabungkannya kembali secara terurut disebut...?\n\nA. Merge Sort\nB. Selection Sort\nC. Radix Sort", 
+        answer:"A", penalty:35, reward:90, explanation:"Benar! Merge Sort membagi (divide) lalu menyatukan kembali (merge)." 
+    },
+    { 
+        question: "Bila array angka [3, 1, 4] diurutkan secara Ascending, angka berapakah yang akan menempati indeks pertama (indeks 0)?\n\nA. 3\nB. 1\nC. 4", 
+        answer:"B", penalty:20, reward:70, explanation:"Benar! Setelah diurutkan menjadi [1, 3, 4], jadi indeks 0 adalah angka 1." 
+    },
+
+    // --- LINKED LIST (5 Soal) ---
+    { 
+        question: "Rangkaian gerbong kereta api yang saling terhubung satu sama lain mirip dengan visualisasi struktur data...?\n\nA. Linked List\nB. Stack\nC. Matrix Array", 
+        answer:"A", penalty:35, reward:90, explanation:"Benar! Gerbong terhubung via sambungan/alamat penunjuk seperti Linked List." 
+    },
+    { 
+        question: "Komponen dasar Linked List berupa objek tunggal yang menampung data dan alamat pointer disebut dengan...?\n\nA. Element\nB. Block\nC. Node", 
+        answer:"C", penalty:30, reward:80, explanation:"Benar! Komponen penyusun Linked List dinamakan Node." 
+    },
+    { 
+        question: "Pointer penunjuk khusus yang menyimpan alamat letak elemen pertama di dalam sebuah Linked List disebut...?\n\nA. Head\nB. Tail\nC. Center", 
+        answer:"A", penalty:30, reward:85, explanation:"Benar! Alamat pembuka Linked List dipegang oleh Head." 
+    },
+    { 
+        question: "Pointer dari Node terakhir pada sebuah Single Linked List akan diarahkan ke tujuan kosong yaitu bernilai...?\n\nA. Zero\nB. Void\nC. Null", 
+        answer:"C", penalty:25, reward:80, explanation:"Benar! Ujung akhir Linked List ditandai dengan rujukan ke NULL." 
+    },
+    { 
+        question: "Linked List yang memiliki dua pointer penunjuk (satu ke node sesudahnya dan satu ke node sebelumnya) disebut...?\n\nA. Double Linked List\nB. Circular Linked List\nC. Binary List", 
+        answer:"A", penalty:40, reward:95, explanation:"Benar! Pointer maju dan mundur merupakan ciri Double Linked List." 
+    }
+];
+
+const chanceCards = [
+    "🚀 Startup anda viral! +100 uang",
+    "💻 Sistem server rusak. Denda -70 uang masuk kas Crypto Faucet",
+    "📈 Investasi AI berhasil. +120 uang",
+    "🖨 Printer overload karena antrian panjang. Bayar denda 50 ke Crypto Faucet",
+    "⚡ Anda menemukan algoritma baru. Maju 3 langkah"
+];
+
+const communityCards = [
+    "📦 Gudang data berhasil dirapikan. +80 uang",
+    "🔌 Server mati mendadak. Denda -60 uang masuk kas Crypto Faucet",
+    "📊 Data pelanggan berhasil diurutkan. +90 uang",
+    "🧠 Tim programmer menemukan bug besar. Denda -50 uang masuk kas Crypto Faucet",
+    "💰 Perusahaan mendapat investor baru. +100 uang"
+];
+
+function startGame(){
+    let count = parseInt(document.getElementById("playerCount").value);
+    if(isNaN(count) || count < 2 || count > 4){
+        alert("Player harus 2-4");
+        return;
+    }
+
+    bgm.play().catch(e => console.log("Menunggu aksi pertama user untuk menyalakan audio."));
+
+    players = [];
+    turnQueue = [];
+    freeParkingPool = 0;
+    poolDisplay.innerHTML = "Crypto Faucet Pool: 💰" + freeParkingPool;
+    diceVisual.innerHTML = "🎲";
+
+    tiles.forEach(tile=>{ tile.owner = null; });
+    document.querySelectorAll(".player").forEach(e=>e.remove());
+
+    for(let i=0; i<count; i++){
+        let player = document.createElement("div");
+        player.classList.add("player");
+        player.style.background = colors[i];
+        player.innerHTML = i+1;
+        board.appendChild(player);
+
+        players.push({
+            name:"P"+(i+1),
+            money:500,
+            position:0,
+            properties:[],
+            element:player,
+            jailTurns: 0 
+        });
+        turnQueue.push(i);
+    }
+
+    gameStarted = true;
+    isMoving = false;
+    btnRoll.disabled = false;
+    updateAllPlayerPositions();
+    updateUI();
+    addLog("🎮 Game dimulai! Aktifkan audio melalui tombol di tengah jika belum terdengar.");
+}
+
+function updateAllPlayerPositions(){
+    tiles.forEach((tile,tileIndex)=>{
+        let playersInTile = [];
+        players.forEach((player,index)=>{
+            if(player.position === tileIndex){
+                playersInTile.push({ player:player, index:index });
+            }
+        });
+
+        playersInTile.forEach((data,order)=>{
+            let playerSize = 24;
+            let spacing = 5;
+            let cols = 2;
+            let row = Math.floor(order / cols);
+            let col = order % cols;
+            let offsetX = 10 + (col * (playerSize + spacing));
+            let offsetY = 10 + (row * (playerSize + spacing));
+
+            data.player.element.style.left = (tile.x + offsetX) + "px";
+            data.player.element.style.top = (tile.y + offsetY) + "px";
+        });
+    });
+}
+
+function updateUI(){
+    const boxes = [
+        document.getElementById("p1box"),
+        document.getElementById("p2box"),
+        document.getElementById("p3box"),
+        document.getElementById("p4box")
+    ];
+
+    boxes.forEach(box=>box.innerHTML="");
+
+    players.forEach((player,index)=>{
+        let propsHTML = "";
+        if(player.properties.length > 0) {
+            propsHTML = "<ol class='property-list'>";
+            player.properties.forEach(p => { propsHTML += `<li>${p}</li>`; });
+            propsHTML += "</ol>";
+        } else {
+            propsHTML = "<br><span style='font-size:11px; color:#aaa; padding-left:15px;'>Belum ada properti</span>";
+        }
+
+        let statusJail = player.jailTurns > 0 ? ` <span style="color:red;">(🔒 Jailed)</span>` : "";
+
+        boxes[index].innerHTML = `
+            <h3 style="color:${colors[index]}; margin: 5px 0;">${player.name}${statusJail}</h3>
+            💰 Money: ${player.money}<br>
+            🏠 Jumlah Properti: ${player.properties.length}
+            <div style="font-weight:bold; margin-top:5px; font-size:12px;">Daftar Properti:</div>
+            ${propsHTML}
+        `;
+    });
+
+    poolDisplay.innerHTML = "Crypto Faucet Pool: 💰" + freeParkingPool;
+
+    if (turnQueue.length > 0 && gameStarted) {
+        turnInfo.innerHTML = "🎯 Giliran " + players[turnQueue[0]].name;
+        let queueText = "";
+        turnQueue.forEach(index=>{
+            queueText += `<span style="color:${colors[index]}">[${players[index].name}]</span> ➜ `;
+        });
+        queueDisplay.innerHTML = queueText;
+    }
+}
+
+function addLog(text){
+    logBox.innerHTML += text + "<br>";
+    logBox.scrollTop = logBox.scrollHeight;
+}
+
+function rollDice(){
+    if(!gameStarted || isMoving) return;
+
+    let currentPlayer = turnQueue[0];
+
+    if(players[currentPlayer].jailTurns > 0) {
+        players[currentPlayer].jailTurns--;
+        addLog(`🔒 ${players[currentPlayer].name} berada di Cyber Jail dan kehilangan putaran ini! (Sisa hukuman: ${players[currentPlayer].jailTurns} turn)`);
+        sfxWrong.currentTime = 0;
+        sfxWrong.play();
+        alert(`🔒 ${players[currentPlayer].name} kehilangan turn saat ini karena dipenjara.`);
+        nextTurn();
+        return;
+    }
+
+    isMoving = true; 
+    btnRoll.disabled = true; 
+    btnRoll.innerHTML = "🎲 Rolling...";
+
+    sfxDice.currentTime = 0;
+    sfxDice.play().catch(e=>console.log(e));
+
+    let counter = 0;
+    let rollInterval = setInterval(() => {
+        let randomFace = Math.floor(Math.random() * 6) + 1;
+        diceVisual.innerHTML = diceFaces[randomFace];
+        counter++;
+        
+        if(counter > 6) {
+            clearInterval(rollInterval);
+            
+            let dice = Math.floor(Math.random()*6)+1;
+            diceVisual.innerHTML = diceFaces[dice] + " (" + dice + ")";
+            btnRoll.innerHTML = "🎲 Roll Dice";
+
+            addLog("🎲 " + players[currentPlayer].name + " mendapat angka " + dice);
+            movePlayer(currentPlayer, dice);
+        }
+    }, 100);
+}
+
+function movePlayer(playerIndex,steps){
+    let count = 0;
+    let interval = setInterval(()=>{
+        players[playerIndex].position++;
+
+        sfxStep.currentTime = 0;
+        sfxStep.play().catch(e=>console.log(e));
+
+        if(players[playerIndex].position >= tiles.length){
+            players[playerIndex].position = 0;
+            players[playerIndex].money += 150;
+            addLog("💰 " + players[playerIndex].name + " melewati START (+150)");
+        }
+
+        updateAllPlayerPositions();
+        count++;
+
+        if(count >= steps){
+            clearInterval(interval);
+            setTimeout(() => { processTile(playerIndex); }, 200); 
+        }
+    },400);
+}
+
+function processTile(playerIndex){
+    let tile = tiles[players[playerIndex].position];
+    addLog("📍 " + players[playerIndex].name + " berada di " + tile.name);
+
+    if(players[playerIndex].position === GO_TO_JAIL_INDEX) {
+        sfxWrong.currentTime = 0;
+        sfxWrong.play();
+        alert(`🚨 Ouch! ${players[playerIndex].name} melakukan illegal hacking! Anda dikirim langsung ke Cyber Jail.`);
+        players[playerIndex].position = CYBER_JAIL_INDEX; 
+        players[playerIndex].jailTurns = 1; 
+        addLog(`🚨 ${players[playerIndex].name} dipindahkan ke Cyber Jail dan terkena skip status.`);
+        updateAllPlayerPositions();
+        nextTurn();
+        return;
+    }
+
+    // --- SLOT KONDISI 1: Mendarat di Crypto Faucet ---
+    if(players[playerIndex].position === FREE_PARKING_INDEX) {
+        sfxFaucet.currentTime = 0;
+        sfxFaucet.play().catch(e => console.log(e));
+
+        if(freeParkingPool > 0) {
+            alert(`🎁 CRYPTO FAUCET! ${players[playerIndex].name} mendapatkan bonus koin terkumpul gratis sebesar 💰${freeParkingPool}!`);
+            players[playerIndex].money += freeParkingPool;
+            addLog(`🎁 ${players[playerIndex].name} menguras Crypto Faucet sebesar +${freeParkingPool}`);
+            freeParkingPool = 0;
+        } else {
+            alert(`🟢 Anda singgah di Crypto Faucet, sayangnya tangki koin sedang kosong.`);
+            addLog(`🟢 ${players[playerIndex].name} singgah di Crypto Faucet.`);
+        }
+    }
+
+    if(tile.type === "property"){
+        if(tile.owner === null){
+            let buy = confirm(tile.name + "\nHarga: " + tile.price + "\nBeli properti?");
+            if(buy){
+                if(players[playerIndex].money >= tile.price){
+                    players[playerIndex].money -= tile.price;
+                    tile.owner = playerIndex;
+                    players[playerIndex].properties.push(tile.name);
+                    addLog("🏠 " + players[playerIndex].name + " membeli " + tile.name);
+                    
+                    // --- SLOT KONDISI 2: Membeli Properti ---
+                    sfxBuy.currentTime = 0;
+                    sfxBuy.play().catch(e => console.log(e));
+                } else {
+                    sfxWrong.currentTime = 0;
+                    sfxWrong.play();
+                    alert("Uang tidak cukup");
+                }
+            }
+        }
+        else if(tile.owner !== null && tile.owner !== playerIndex){
+            sfxWrong.currentTime = 0;
+            sfxWrong.play();
+            players[playerIndex].money -= tile.rent;
+            players[tile.owner].money += tile.rent;
+            addLog("💸 " + players[playerIndex].name + " membayar sewa ke " + players[tile.owner].name);
+        }
+
+        showChallenge(playerIndex);
+        return; 
+    }
+
+    if(tile.type === "chance"){ processChance(playerIndex); return; }
+    if(tile.type === "community"){ processCommunity(playerIndex); return; }
+
+    if(tile.type === "safe" || tile.type === "start" || tile.type === "jail"){
+        if(players[playerIndex].position === CYBER_JAIL_INDEX && players[playerIndex].jailTurns === 0) {
+            addLog("🟢 Safe Zone: Berkunjung saja ke Cyber Jail.");
+        } else if (players[playerIndex].position !== FREE_PARKING_INDEX) {
+            addLog("🟢 Safe Zone");
+        }
+    }
+
+    nextTurn();
+}
+
+function processChance(playerIndex){
+    let card = chanceCards[Math.floor(Math.random()*chanceCards.length)];
+    
+    // --- SLOT KONDISI 3A: Mendapatkan Kartu Kesempatan ---
+    sfxCard.currentTime = 0;
+    sfxCard.play().catch(e => console.log(e));
+
+    alert("🎴 KESEMPATAN\n\n" + card);
+    addLog("🎴 " + card);
+
+    if(card.includes("+100")) players[playerIndex].money += 100;
+    if(card.includes("+120")) players[playerIndex].money += 120;
+    if(card.includes("-70")) { players[playerIndex].money -= 70; freeParkingPool += 70; }
+    if(card.includes("Bayar denda 50")) { players[playerIndex].money -= 50; freeParkingPool += 50; }
+    if(card.includes("Maju 3")){
+        players[playerIndex].position += 3;
+        if(players[playerIndex].position >= tiles.length){ players[playerIndex].position %= tiles.length; }
+        updateAllPlayerPositions();
+    }
+    nextTurn();
+}
+
+function processCommunity(playerIndex){
+    let card = communityCards[Math.floor(Math.random()*communityCards.length)];
+    
+    // --- SLOT KONDISI 3B: Mendapatkan Kartu Dana Umum ---
+    sfxCard.currentTime = 0;
+    sfxCard.play().catch(e => console.log(e));
+
+    alert("📦 DANA UMUM\n\n" + card);
+    addLog("📦 " + card);
+
+    if(card.includes("+80")) players[playerIndex].money += 80;
+    if(card.includes("+90")) players[playerIndex].money += 90;
+    if(card.includes("+100")) players[playerIndex].money += 100;
+    if(card.includes("-60")) { players[playerIndex].money -= 60; freeParkingPool += 60; }
+    if(card.includes("-50")) { players[playerIndex].money -= 50; freeParkingPool += 50; }
+    nextTurn();
+}
+
+function showChallenge(playerIndex){
+    let challenge = storyChallenges[Math.floor(Math.random()*storyChallenges.length)];
+    
+    let choose = confirm("⚡ TANTANGAN STRUKTUR DATA!\n\nJawab kuis Pilihan Ganda untuk mendapatkan bonus modal.\n\nOK = Jawab Kuis\nCancel = Lewati & Bayar Denda 💰" + challenge.penalty + " ke Crypto Faucet");
+
+    if(choose){
+        let ans = prompt(challenge.question + "\n\nKetik Jawaban Anda (A, B, atau C):");
+
+        if(ans && ans.toUpperCase().trim() === challenge.answer) {
+            sfxCorrect.currentTime = 0;
+            sfxCorrect.play().catch(e=>console.log(e));
+
+            alert("✅ BENAR!\n\n" + challenge.explanation);
+            players[playerIndex].money += challenge.reward;
+            addLog("✅ " + players[playerIndex].name + " menjawab BENAR (+ " + challenge.reward + ")");
+        } else {
+            sfxWrong.currentTime = 0;
+            sfxWrong.play().catch(e=>console.log(e));
+
+            alert("❌ SALAH!\n\nJawaban yang benar adalah " + challenge.answer + ".\n" + challenge.explanation + `\nDenda dialokasikan ke Crypto Faucet.`);
+            players[playerIndex].money -= challenge.penalty;
+            freeParkingPool += challenge.penalty;
+            addLog("❌ " + players[playerIndex].name + " menjawab SALAH (-" + challenge.penalty + ")");
+        }
+    } else {
+        sfxWrong.currentTime = 0;
+        sfxWrong.play().catch(e=>console.log(e));
+        players[playerIndex].money -= challenge.penalty;
+        freeParkingPool += challenge.penalty;
+        addLog("💸 " + players[playerIndex].name + " skip tantangan, denda masuk Crypto Faucet (-" + challenge.penalty + ")");
+    }
+
+    nextTurn();
+}
+
+function nextTurn(){
+    if (!checkWinner()) {
+        turnQueue.push(turnQueue.shift());
+        isMoving = false;
+        btnRoll.disabled = false; 
+        updateUI();
+    }
+}
+
+function checkWinner(){
+    let gameOver = false;
+
+    for (let player of players) {
+        // --- SLOT KONDISI 4: Player Menang ---
+        if(player.money >= targetMoney){
+            sfxWin.currentTime = 0;
+            sfxWin.play().catch(e => console.log(e));
+
+            alert(`🎉 SELAMAT! ${player.name} adalah WINNER 🏆 karena berhasil mengumpulkan uang sebanyak 💰${player.money} (Target: ${targetMoney})!`);
+            addLog(`🏆 ${player.name} MENANG PERMAINAN!`);
+            gameOver = true;
+            break;
+        }
+        // --- SLOT KONDISI 5: Player Bangkrut/Kalah ---
+        if(player.money <= 0){
+            sfxLose.currentTime = 0;
+            sfxLose.play().catch(e => console.log(e));
+
+            alert(`😭 ANDA BANGKRUT! ${player.name} mendapatkan gelar KEKALAHAN karena kehabisan modal bisnis.`);
+            addLog(`💀 ${player.name} BANGKRUT! Game Selesai.`);
+            gameOver = true;
+            break;
+        }
+    }
+
+    if (gameOver) {
+        gameStarted = false;
+        btnRoll.disabled = true;
+        turnInfo.innerHTML = "🏁 GAME OVER 🏁";
+        queueDisplay.innerHTML = "Permainan telah berakhir.";
+        return true;
+    }
+    return false;
+}
+</script>
+
+</body>
+</html>
